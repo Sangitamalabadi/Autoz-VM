@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoZ - Solapur's No.1 Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <style> body{font-family:'Plus Jakarta Sans', sans-serif} </style>
+</head>
+<body class="bg-[#f8f9fa]">
+    <!-- Navbar -->
+    <nav class="bg-white sticky top-0 z-50 border-b border-gray-100 px-6 md:px-12 py-4 flex justify-between items-center">
+        <h1 class="text-2xl font-extrabold text-blue-600">AutoZ <span class="text-sm font-medium text-gray-500 tracking-widest ml-1">MARKETPLACE • AUCTIONS</span></h1>
+        <div class="flex gap-3">
+            <a href="/auctions/" class="bg-blue-600 text-white px-5 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">Auctions</a>
+            <a href="/add/" class="bg-white border border-gray-200 px-5 py-2 rounded-lg font-bold text-sm hover:bg-gray-50">+ List Vehicle +</a>
+        </div>
+    </nav>
+
+    <!-- Hero Search -->
+    <div class="text-center mt-12 mb-8 px-4">
+        <h2 class="text-4xl font-extrabold mb-6">Find your next vehicle</h2>
+        <form method="GET" class="max-w-2xl mx-auto bg-white p-2 rounded-full shadow-sm border border-gray-200 flex">
+            <input type="text" name="q" value="{{ query }}" placeholder="Search make, model... (Ex: Swift, Nexon, Scorpio)" class="flex-1 px-6 py-2 outline-none text-sm bg-transparent">
+            <button class="bg-blue-600 text-white px-8 py-2.5 rounded-full font-bold text-sm">Search</button>
+        </form>
+    </div>
+
+    <!-- Grid -->
+    <div class="max-w-7xl mx-auto px-6 md:px-12 pb-20">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for v in vehicles %}
+            <a href="/auctions/{{ v.id }}/" class="group bg-white rounded-2xl p-3 shadow-[0_2px_10px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-[0_10px_30px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300">
+                <div class="relative overflow-hidden rounded-xl">
+                    {% if v.image %}
+                        <img src="{{ v.image.url }}" class="w-full h-[220px] object-cover group-hover:scale-105 transition duration-500">
+                    {% else %}
+                        <div class="w-full h-[220px] bg-gray-100 flex items-center justify-center">🚗 No Image</div>
+                    {% endif %}
+                    {% if v.is_verified %}
+                    <span class="absolute top-3 right-3 bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-full">✓ Verified</span>
+                    {% endif %}
+                    <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/50 to-transparent h-20"></div>
+                </div>
+                <div class="pt-4 px-2 pb-1">
+                    <h3 class="font-bold text-[15px] leading-tight truncate">{{ v.title }}</h3>
+                    <p class="text-blue-600 font-extrabold text-[15px] mt-1">${{ v.price }}</p>
+                    <p class="text-gray-400 text-xs mt-1 flex items-center gap-1">View Details → Live Auction</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

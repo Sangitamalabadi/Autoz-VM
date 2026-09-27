@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>My Bids - AutoZ</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>body{font-family:'Inter',sans-serif}</style>
+</head>
+<body class="bg-[#f3f5f8] min-h-screen">
+
+<!-- Navbar -->
+<nav class="bg-white border-b sticky top-0 z-50 backdrop-blur bg-white/90">
+  <div class="max-w-5xl mx-auto px-6 lg:px-8 py-4 flex justify-between items-center">
+    <a href="/" class="font-black text-[22px] tracking-tighter text-[#0f172a]">Auto<span class="text-blue-600">Z</span></a>
+    <span class="font-bold text-sm bg-gray-900 text-white px-4 py-1.5 rounded-full">My Bids - {{ request.user.username }} • USA & UK</span>
+  </div>
+</nav>
+
+<div class="max-w-5xl mx-auto px-6 lg:px-8 py-8">
+
+  <!-- Header -->
+  <div class="flex justify-between items-end mb-6">
+    <div>
+      <h1 class="text-3xl font-black text-gray-900 tracking-tight">My Bids</h1>
+      <p class="text-sm text-gray-500 mt-1 font-medium">Track all your active auctions in USD ($)</p>
+    </div>
+    <div class="bg-white border px-4 py-2 rounded-xl text-xs font-bold">
+      <span class="text-gray-400">TOTAL BIDS:</span> <span class="text-blue-600 text-base ml-1">{{ bids|length }}</span>
+    </div>
+  </div>
+
+  <div class="space-y-4">
+  {% for b in bids %}
+  <div class="bg-white border border-gray-200/70 rounded-[20px] p-0 flex overflow-hidden hover:shadow-[0_20px_40px_-15px_rgba(0,0,0,0.1)] hover:border-blue-200 transition-all duration-300 group">
+
+    <!-- Vehicle Image -->
+    <div class="w-[200px] h-[148px] bg-gray-100 relative flex-shrink-0 overflow-hidden">
+      {% if b.auction.vehicle.image %}
+        <img src="{{ b.auction.vehicle.image.url }}" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
+      {% else %}
+        <img src="https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?q=80&w=400" class="w-full h-full object-cover group-hover:scale-110 transition duration-700" />
+      {% endif %}
+      <div class="absolute top-3 left-3 bg-white/95 backdrop-blur text-[10px] font-black px-2.5 py-1 rounded-full shadow-sm tracking-wider">
+        {{ b.auction.vehicle.company.name|upper }}
+      </div>
+      <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent h-12"></div>
+      <div class="absolute bottom-2 left-3 text-white text-[11px] font-bold flex items-center gap-1"><i class="fa-solid fa-location-dot"></i> {{ b.auction.vehicle.location|default:"TX, USA" }}</div>
+    </div>
+
+    <!-- Details -->
+    <div class="flex-1 p-5 flex justify-between items-center">
+      <div class="flex-1">
+        <h3 class="font-extrabold text-[17px] text-gray-900 leading-tight group-hover:text-blue-600 transition">{{ b.auction.vehicle.title }}</h3>
+        <div class="flex items-center gap-2 mt-2">
+          <span class="text-[11px] font-bold bg-gray-100 border px-2.5 py-1 rounded-full text-gray-600">{{ b.auction.vehicle.year|default:"2023" }} • {{ b.auction.vehicle.km|default:"42,000" }} mi</span>
+          <span class="text-[11px] font-bold bg-blue-50 text-blue-600 border border-blue-100 px-2.5 py-1 rounded-full">#{{ b.auction.id }}</span>
+        </div>
+        <div class="mt-3 flex items-center gap-3">
+          <span class="text-[11px] text-gray-400 font-semibold"><i class="fa-regular fa-clock mr-1"></i>{{ b.bid_time|date:"d M, h:i A" }}</span>
+          <span class="text-[11px] text-gray-400 font-semibold">• Bidder: {{ b.bidder_name }}</span>
+        </div>
+      </div>
+
+      <!-- Bid Amount -->
+      <div class="text-right ml-6 pl-6 border-l border-gray-100 min-w-[160px]">
+        <p class="text-[10px] font-black tracking-[0.15em] text-gray-400 uppercase">Your Bid</p>
+        <p class="text-[26px] font-black text-blue-600 tracking-tight mt-1">${{ b.bid_amount }}</p>
+        <p class="text-[11px] text-gray-400 font-medium line-through">Current: ${{ b.auction.current_price }}</p>
+
+        <div class="mt-3">
+          {% if b.bid_amount >= b.auction.current_price %}
+            <span class="bg-green-500 text-white text-[10px] font-black px-3 py-1 rounded-full tracking-wider"><i class="fa-solid fa-crown mr-1"></i>WINNING</span>
+          {% else %}
+            <span class="bg-red-50 text-red-600 border border-red-100 text-[10px] font-black px-3 py-1 rounded-full tracking-wider">OUTBID</span>
+          {% endif %}
+        </div>
+        <a href="/auction/{{ b.auction.id }}/" class="mt-3 inline-flex items-center text-[12px] font-bold bg-gray-900 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition">View <i class="fa-solid fa-arrow-right ml-2 text-[10px]"></i></a>
+      </div>
+    </div>
+
+  </div>
+  {% empty %}
+  <div class="bg-white rounded-[24px] p-20 text-center border-2 border-dashed border-gray-200">
+    <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
+      <i class="fa-solid fa-gavel text-2xl text-gray-300"></i>
+    </div>
+    <p class="font-black text-gray-900 mt-4">No bids yet</p>
+    <p class="text-sm text-gray-400 mt-1">You Haven't Placed any Bids yet..! Go Bid on a Vehicle in USD ($)</p>
+    <a href="/" class="mt-6 inline-block bg-blue-600 text-white px-8 py-3 rounded-full text-sm font-black hover:bg-blue-700 transition">Browse Cars in USA</a>
+  </div>
+  {% endfor %}
+  </div>
+
+</div>
+</body>
+</html>
