@@ -1,0 +1,7 @@
+Django==5.0.6
+psycopg2-binary
+whitenoise
+gunicorn
+Pillow
+djangorestframework
+django-cors-headers
