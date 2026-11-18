@@ -13,14 +13,15 @@ import {
 
 import api, {
   initializeCSRF,
+  BACKEND_URL,
 } from './api'
 
 import VehicleDetails from './VehicleDetails'
 import './App.css'
 import BuyerMyBids from './BuyerMyBids'
 
-const BACKEND_URL = 'http://127.0.0.1:8000'
 const MAX_IMAGES = 15
+
 
 // =====================================================
 // COMMON HELPERS

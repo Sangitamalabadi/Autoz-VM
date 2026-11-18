@@ -27,6 +27,7 @@ from rest_framework import (
     permissions,
     status,
     serializers,
+    authentication,
 )
 from rest_framework.exceptions import ValidationError
 from rest_framework.parsers import (
@@ -58,6 +59,7 @@ from .serializers import (
 
 
 User = get_user_model()
+
 
 
 # =====================================
@@ -1091,17 +1093,16 @@ class AdminBidListAPI(generics.ListAPIView):
 
     serializer_class = AdminBidSerializer
 
+    authentication_classes = [
+        authentication.SessionAuthentication,
+    ]
+
     permission_classes = [
         permissions.IsAuthenticated,
         permissions.IsAdminUser,
     ]
 
     def get_queryset(self):
-
-        user = self.request.user
-
-        if not user.is_authenticated or not user.is_staff:
-            return Bid.objects.none()
 
         return Bid.objects.select_related(
             'user',
@@ -1136,7 +1137,11 @@ class AdminBidListAPI(generics.ListAPIView):
                 status=status.HTTP_403_FORBIDDEN,
             )
 
-        return super().list(request, *args, **kwargs)
+        return super().list(
+            request,
+            *args,
+            **kwargs,
+        )
 
 
 # =====================================

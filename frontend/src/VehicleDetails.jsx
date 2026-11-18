@@ -1,10 +1,9 @@
 
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import api, { initializeCSRF } from './api'
+import api, { initializeCSRF, BACKEND_URL } from './api'
 import './VehicleDetails.css'
 
-const BACKEND_URL = 'http://127.0.0.1:8000'
 const MILES_PER_KM = 0.621371
 
 const TICKET_TYPES = [
@@ -333,7 +332,6 @@ function VehicleDetails() {
     try {
       setBidLoading(true)
 
-      // Get a fresh CSRF token
       const csrfToken = await initializeCSRF()
 
       if (!csrfToken) {
@@ -342,7 +340,6 @@ function VehicleDetails() {
         )
       }
 
-      // Submit bid to Django
       const response = await api.post(
         'bids/',
         {
@@ -363,7 +360,6 @@ function VehicleDetails() {
       setBidMessage('Your bid has been submitted successfully!')
       setBidAmount('')
 
-      // Refresh auction price and bid history
       await refreshAuctionData()
 
     } catch (err) {

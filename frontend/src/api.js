@@ -1,9 +1,20 @@
 
 import axios from 'axios'
 
+// =====================================
+// BACKEND URL CONFIGURATION
+// =====================================
+
+export const BACKEND_URL = (
+  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
+).replace(/\/+$/, '')
+
+// =====================================
+// AXIOS INSTANCE
+// =====================================
+
 const api = axios.create({
-  // Use localhost consistently for frontend and backend
-  baseURL: 'http://localhost:8000/api/',
+  baseURL: `${BACKEND_URL}/api/`,
   timeout: 15000,
   withCredentials: true,
   headers: {

@@ -1,12 +1,18 @@
+
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import api, { initializeCSRF } from './api'
-
-const BACKEND_URL = 'http://127.0.0.1:8000'
+import api, {
+  initializeCSRF,
+  BACKEND_URL,
+} from './api'
 
 function imageUrl(value) {
   if (!value) return ''
-  if (value.startsWith('http')) return value
+
+  if (value.startsWith('http://') || value.startsWith('https://')) {
+    return value
+  }
+
   return `${BACKEND_URL}${value.startsWith('/') ? '' : '/'}${value}`
 }
 
@@ -116,7 +122,6 @@ function SellerPortal() {
         await initializeCSRF()
 
         const response = await api.get('auth/me/')
-
         const data = response.data
 
         if (!active) return

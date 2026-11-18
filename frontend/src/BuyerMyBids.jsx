@@ -1,9 +1,7 @@
 
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import api from './api'
-
-const BACKEND_URL = 'http://localhost:8000'
+import api, { BACKEND_URL } from './api'
 
 function getImageUrl(image) {
   if (!image) return null
@@ -499,8 +497,6 @@ function BuyerMyBids() {
 
       <div className="container">
 
-        {/* PAGE HEADER AND SUMMARY */}
-
         <div className="autoz-bids-header">
 
           <div>
@@ -609,8 +605,6 @@ function BuyerMyBids() {
           </div>
         </div>
 
-        {/* LOADING */}
-
         {loading && (
           <div className="text-center py-5">
             <div
@@ -625,8 +619,6 @@ function BuyerMyBids() {
           </div>
         )}
 
-        {/* ERROR */}
-
         {!loading && error && (
           <div
             className="alert"
@@ -640,8 +632,6 @@ function BuyerMyBids() {
             {error}
           </div>
         )}
-
-        {/* BID HISTORY */}
 
         {!loading && !error && (
           <>
@@ -665,8 +655,6 @@ function BuyerMyBids() {
                 </span>
 
               </div>
-
-              {/* NO BIDS */}
 
               {bids.length === 0 && (
                 <div className="autoz-empty-state">
@@ -695,15 +683,11 @@ function BuyerMyBids() {
                 </div>
               )}
 
-              {/* BID LIST */}
-
               {bids.map((bid) => {
                 const imageUrl = getImageUrl(bid.vehicle_image)
 
                 return (
                   <div className="autoz-bid-row" key={bid.id}>
-
-                    {/* VEHICLE IMAGE */}
 
                     <div>
                       {imageUrl ? (
@@ -729,8 +713,6 @@ function BuyerMyBids() {
                       </div>
                     </div>
 
-                    {/* VEHICLE DETAILS */}
-
                     <div>
                       <h4 className="autoz-vehicle-title">
                         {bid.vehicle_title || 'Vehicle'}
@@ -745,8 +727,6 @@ function BuyerMyBids() {
                       </p>
                     </div>
 
-                    {/* BID AMOUNT */}
-
                     <div className="autoz-amount-section">
                       <p className="autoz-amount-label">
                         Your Bid Amount
@@ -756,8 +736,6 @@ function BuyerMyBids() {
                         {formatAmount(bid.bid_amount)}
                       </h3>
                     </div>
-
-                    {/* STATUS */}
 
                     <div className="autoz-status-section">
 
@@ -784,8 +762,6 @@ function BuyerMyBids() {
                       )}
 
                     </div>
-
-                    {/* VIEW VEHICLE */}
 
                     <div className="autoz-view-section">
                       {bid.vehicle_id ? (
@@ -816,8 +792,6 @@ function BuyerMyBids() {
               })}
 
             </div>
-
-            {/* BOTTOM BANNER */}
 
             <div className="autoz-bottom-banner">
               <p className="autoz-bottom-message">
