@@ -1,0 +1,13 @@
+﻿venv/
+.venv/
+__pycache__/
+*.py[cod]
+*.sqlite3
+.env
+.env.*
+!.env.example
+node_modules/
+dist/
+media/
+staticfiles/
+.vite/
