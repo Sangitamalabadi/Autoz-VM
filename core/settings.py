@@ -91,7 +91,22 @@ INSTALLED_APPS = [
     'rest_framework',
     'drf_spectacular',
     'corsheaders',
+
+    # Cloudinary
+    'cloudinary_storage',
+    'cloudinary',
 ]
+
+
+# --------------------------------------------------
+# CLOUDINARY CONFIGURATION
+# --------------------------------------------------
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
 
 
 # --------------------------------------------------
@@ -260,7 +275,9 @@ STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 STORAGES = {
     'default': {
-        'BACKEND': 'django.core.files.storage.FileSystemStorage',
+        'BACKEND': (
+            'cloudinary_storage.storage.MediaCloudinaryStorage'
+        ),
     },
     'staticfiles': {
         'BACKEND': (
@@ -343,3 +360,21 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # --------------------------------------------------
 
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
+
+
+
+
+# TEMPORARY CLOUDINARY DIAGNOSTICS
+import logging
+from django.core.files.storage import default_storage
+
+logger = logging.getLogger(__name__)
+
+logger.warning(
+    "AUTOZ STORAGE CHECK | "
+    "BACKEND=%s | CLOUD=%s | API_KEY_PRESENT=%s | API_SECRET_PRESENT=%s",
+    default_storage.__class__.__module__ + "." + default_storage.__class__.__name__,
+    bool(CLOUDINARY_STORAGE.get("CLOUD_NAME")),
+    bool(CLOUDINARY_STORAGE.get("API_KEY")),
+    bool(CLOUDINARY_STORAGE.get("API_SECRET")),
+)
