@@ -12,15 +12,19 @@ const TICKET_TYPES = [
   { value: 'VEHICLE', label: 'Vehicle Not As Described' },
   { value: 'OTHER', label: 'Other' },
 ]
-
 function getImageUrl(image) {
   if (!image) return ''
 
-  if (/^https?:\/\//i.test(image)) {
-    return image
+  const normalized = String(image).replace(/\\/g, '/')
+  const filename = normalized.split('/').pop()
+
+  if (/^[1-7]\.webp$/i.test(filename) && normalized.includes('vehicles')) {
+    return `/vehicles/${filename}`
   }
 
-  return `${BACKEND_URL}${image.startsWith('/') ? '' : '/'}${image}`
+  if (/^https?:\/\//i.test(normalized)) return normalized
+
+  return `${BACKEND_URL}${normalized.startsWith('/') ? '' : '/'}${normalized}`
 }
 
 function formatPrice(price) {

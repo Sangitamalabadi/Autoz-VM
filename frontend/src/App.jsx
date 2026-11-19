@@ -1,4 +1,5 @@
 
+
 import { useEffect, useMemo, useState } from 'react'
 
 import {
@@ -26,11 +27,19 @@ const MAX_IMAGES = 15
 // =====================================================
 // COMMON HELPERS
 // =====================================================
-
 function getImageUrl(image) {
   if (!image) return ''
-  if (image.startsWith('http')) return image
-  return `${BACKEND_URL}${image.startsWith('/') ? '' : '/'}${image}`
+
+  const normalized = String(image).replace(/\\/g, '/')
+  const filename = normalized.split('/').pop()
+
+  if (/^[1-7]\.webp$/i.test(filename) && normalized.includes('vehicles')) {
+    return `/vehicles/${filename}`
+  }
+
+  if (/^https?:\/\//i.test(normalized)) return normalized
+
+  return `${BACKEND_URL}${normalized.startsWith('/') ? '' : '/'}${normalized}`
 }
 
 function formatPrice(price) {
@@ -88,6 +97,8 @@ async function getCSRFHeaders() {
 
   return { 'X-CSRFToken': token }
 }
+
+
 
 // =====================================================
 // SELLER LOGIN
