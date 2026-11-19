@@ -103,6 +103,27 @@ export function getCSRFToken() {
 }
 
 // =====================================
+// ADMIN LOGIN API
+// =====================================
+
+export async function adminLogin(username, password) {
+  // Initialize CSRF before login
+  await initializeCSRF()
+
+  const response = await api.post('admin/login/', {
+    username,
+    password,
+  })
+
+  // Store the returned CSRF token
+  if (response.data?.csrfToken) {
+    setCSRFToken(response.data.csrfToken)
+  }
+
+  return response.data
+}
+
+// =====================================
 // RESPONSE INTERCEPTOR
 // =====================================
 

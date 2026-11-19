@@ -1,5 +1,3 @@
-
-
 import { useEffect, useMemo, useState } from 'react'
 
 import {
@@ -15,6 +13,7 @@ import {
 import api, {
   initializeCSRF,
   BACKEND_URL,
+  adminLogin,
 } from './api'
 
 import VehicleDetails from './VehicleDetails'
@@ -22,8 +21,6 @@ import './App.css'
 import BuyerMyBids from './BuyerMyBids'
 
 const MAX_IMAGES = 15
-
-
 // =====================================================
 // COMMON HELPERS
 // =====================================================
@@ -2935,6 +2932,211 @@ function SellerEditPage() {
 
 
 // =====================================================
+// AUTOZ ADMIN LOGIN
+// =====================================================
+
+function AdminLoginPanel() {
+  const navigate = useNavigate()
+
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+
+    if (loading) return
+
+    setError('')
+
+    if (!username.trim() || !password) {
+      setError('Please enter your username and password.')
+      return
+    }
+
+    setLoading(true)
+
+    try {
+      const response = await adminLogin(
+        username.trim(),
+        password
+      )
+
+      if (response?.success && response?.user?.is_staff) {
+        setUsername('')
+        setPassword('')
+
+        navigate('/admin/bids', { replace: true })
+      } else {
+        setError(
+          response?.message || 'Admin login unsuccessful.'
+        )
+      }
+    } catch (err) {
+      console.error('ADMIN LOGIN ERROR:', err)
+
+      if (err.response?.status === 401) {
+        setError('Invalid username or password.')
+      } else if (err.response?.status === 403) {
+        setError('Admin access is restricted to staff accounts.')
+      } else if (err.response?.status === 404) {
+        setError('Admin Login API not found.')
+      } else {
+        setError(
+          getErrorMessage(err, 'Unable to login. Please try again.')
+        )
+      }
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <div
+      style={{
+        minHeight: '100vh',
+        background: '#101827',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '20px',
+        boxSizing: 'border-box',
+      }}
+    >
+      <div
+        style={{
+          width: '100%',
+          maxWidth: '430px',
+          background: '#fff',
+          padding: '35px',
+          borderRadius: '16px',
+          boxShadow: '0 15px 50px rgba(0,0,0,0.25)',
+          boxSizing: 'border-box',
+        }}
+      >
+        <div
+          style={{
+            textAlign: 'center',
+            marginBottom: '28px',
+          }}
+        >
+          <div
+            style={{
+              fontSize: '13px',
+              fontWeight: '800',
+              letterSpacing: '3px',
+              color: '#b8860b',
+            }}
+          >
+            AUTOZ
+          </div>
+
+          <h1
+            style={{
+              margin: '12px 0 8px',
+              fontSize: '27px',
+              color: '#101827',
+            }}
+          >
+            Admin Login
+          </h1>
+
+          <p style={{ color: '#667085', fontSize: '14px' }}>
+            Sign in to access the administration dashboard.
+          </p>
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <label
+            htmlFor="admin-username"
+            style={formLabelStyle}
+          >
+            Username
+          </label>
+
+          <input
+            id="admin-username"
+            type="text"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+            placeholder="Enter admin username"
+            autoComplete="username"
+            required
+            style={authInputStyle}
+          />
+
+          <label
+            htmlFor="admin-password"
+            style={formLabelStyle}
+          >
+            Password
+          </label>
+
+          <input
+            id="admin-password"
+            type="password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="Enter admin password"
+            autoComplete="current-password"
+            required
+            style={authInputStyle}
+          />
+
+          {error && (
+            <div role="alert" style={errorStyle}>
+              {error}
+            </div>
+          )}
+
+          <button
+            type="submit"
+            disabled={loading}
+            style={{
+              width: '100%',
+              padding: '14px',
+              background: '#d6a52c',
+              color: '#101827',
+              border: 'none',
+              borderRadius: '8px',
+              fontWeight: '800',
+              cursor: loading ? 'not-allowed' : 'pointer',
+              opacity: loading ? 0.7 : 1,
+            }}
+          >
+            {loading ? 'Signing in...' : 'Sign In to Admin'}
+          </button>
+        </form>
+
+        <button
+          type="button"
+          onClick={() => navigate('/')}
+          style={{
+            ...secondaryButtonStyle,
+            width: '100%',
+            marginTop: '15px',
+          }}
+        >
+          ← Back to Marketplace
+        </button>
+
+        <p
+          style={{
+            textAlign: 'center',
+            fontSize: '11px',
+            color: '#98a2b3',
+            marginTop: '25px',
+          }}
+        >
+          AUTOZ ADMINISTRATION · AUTHORIZED ACCESS ONLY
+        </p>
+      </div>
+    </div>
+  )
+}
+
+// =====================================================
 // ADMIN BIDS DASHBOARD
 // =====================================================
 
@@ -2971,10 +3173,10 @@ function AdminBidsDashboard() {
       console.error('ADMIN BIDS ERROR:', err)
 
       if (err.response?.status === 401) {
-        setError(
-          'You are not authenticated as an administrator. Please log in through Django Admin.'
-        )
-      } else if (err.response?.status === 403) {
+        navigate('/admin/login', { replace: true })
+         return
+      }
+        else if (err.response?.status === 403) {
         setError(
           'Admin access denied. Please log in through Django Admin using your staff account.'
         )
@@ -3592,6 +3794,7 @@ function AdminBidsDashboard() {
 
 function SellerPortal() {
   const navigate = useNavigate()
+  const [bids, setBids] = useState([])
 
   const [seller, setSeller] = useState(null)
   const [loading, setLoading] = useState(true)
