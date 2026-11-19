@@ -5,9 +5,12 @@ import axios from 'axios'
 // BACKEND URL CONFIGURATION
 // =====================================
 
-export const BACKEND_URL = (
-  import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
-).replace(/\/+$/, '')
+export const BACKEND_URL = import.meta.env.PROD
+  ? 'https://autoz-backend.onrender.com'
+  : (
+      import.meta.env.VITE_API_BASE_URL ||
+      'http://localhost:8000'
+    ).replace(/\/+$/, '')
 
 // =====================================
 // AXIOS INSTANCE
