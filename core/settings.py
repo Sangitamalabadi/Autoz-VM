@@ -61,11 +61,15 @@ CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
 
-SESSION_COOKIE_SAMESITE = 'Lax'
-CSRF_COOKIE_SAMESITE = 'Lax'
+# Cross-origin frontend/backend cookie configuration
+SESSION_COOKIE_SAMESITE = 'None' if not DEBUG else 'Lax'
+CSRF_COOKIE_SAMESITE = 'None' if not DEBUG else 'Lax'
 
 SESSION_COOKIE_NAME = 'sessionid'
 CSRF_COOKIE_NAME = 'csrftoken'
+
+SESSION_COOKIE_PATH = '/'
+CSRF_COOKIE_PATH = '/'
 
 
 # --------------------------------------------------
@@ -306,7 +310,6 @@ CSRF_TRUSTED_ORIGINS = [
     FRONTEND_URL,
 ]
 
-# Keep additional local development origins available.
 if DEBUG:
     CORS_ALLOWED_ORIGINS.extend([
         'http://127.0.0.1:5173',
@@ -334,5 +337,9 @@ SESSION_SAVE_EVERY_REQUEST = False
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+
+# --------------------------------------------------
+# CSRF FAILURE DIAGNOSTICS
+# --------------------------------------------------
 
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
