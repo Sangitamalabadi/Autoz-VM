@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AutoZ - US & UK No.1 Marketplace</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+    <style> body{font-family:'Plus Jakarta Sans', sans-serif} </style>
+</head>
+<body class="bg-[#f8f9fa]">
+    <!-- Navbar - US UK -->
+    <nav class="bg-white sticky top-0 z-50 border-b border-gray-100 px-6 md:px-12 py-4 flex justify-between items-center">
+        <a href="/"><h1 class="text-2xl font-extrabold text-blue-600">AutoZ <span class="text-sm font-medium text-gray-500 tracking-widest ml-1">US • UK • AUCTIONS</span></h1></a>
+        <div class="flex gap-3 items-center">
+            <a href="/auctions/" class="bg-blue-600 text-white px-5 py-2 rounded-lg font-bold text-sm hover:bg-blue-700">Auctions</a>
+
+            <!-- MY BIDS - AATA KAYAM DISEL -->
+            <a href="/my-bids/" class="bg-black text-white px-5 py-2 rounded-lg font-extrabold text-sm hover:bg-gray-800 border-2 border-black">
+                🔨 My Bids {% if request.user.is_authenticated %}({{ request.user.username }}){% endif %}
+            </a>
+
+            <a href="/add/" class="bg-white border border-gray-200 px-5 py-2 rounded-lg font-bold text-sm hover:bg-gray-50">+ List Vehicle +</a>
+            {% if request.user.is_authenticated %}
+                <a href="/logout/" class="bg-white border border-gray-200 px-3 py-2 rounded-lg font-bold text-sm">Logout</a>
+            {% else %}
+                <a href="/login/" class="bg-white border border-black text-black px-5 py-2 rounded-lg font-bold text-sm">Login</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <!-- Hero Search US UK - MODULE 1 SEARCH -->
+    <div class="text-center mt-12 mb-8 px-4">
+        <h2 class="text-4xl font-extrabold mb-2">Find your next vehicle in US & UK</h2>
+        <p class="text-sm text-gray-500 mb-6">15,000+ Premium cars from Tesla, Jaguar, Land Rover, Ford - Pricing in $ USD</p>
+        <form method="GET" class="max-w-2xl mx-auto bg-white p-2 rounded-full shadow-sm border border-gray-200 flex">
+            <input type="text" name="q" value="{{ query|default:'' }}" placeholder="Search make, model... (Ex: Tesla Model 3, Range Rover, Mustang)" class="flex-1 px-6 py-2 outline-none text-sm bg-transparent">
+            <button class="bg-blue-600 text-white px-8 py-2.5 rounded-full font-bold text-sm">Search</button>
+        </form>
+    </div>
+
+    <!-- TOP COMPANIES US UK -->
+    <div class="max-w-7xl mx-auto px-6 md:px-12 mb-10">
+        <div class="bg-white rounded-[20px] p-5 border shadow-sm">
+            <h3 class="font-extrabold text-sm tracking-widest text-gray-400 mb-4">🏆 TOP BRANDS - US & UK</h3>
+            <div class="flex gap-3 overflow-x-auto pb-2">
+                {% for c in companies %}
+                <a href="/company/{{ c.name }}/" class="min-w-[140px] bg-[#f6f7f8] hover:bg-blue-50 hover:border-blue-200 border rounded-2xl p-4 text-center transition group">
+                    <div class="text-2xl mb-1">
+                        {% if c.name == "Tesla" %}⚡
+                        {% elif c.name == "Ford" %}🇺🇸
+                        {% elif c.name == "Jaguar" or c.name == "Land Rover" or c.name == "Aston Martin" %}🇬🇧
+                        {% else %}🏢{% endif %}
+                    </div>
+                    <p class="font-extrabold text-sm group-hover:text-blue-600">{{ c.name }}</p>
+                    <p class="text-[11px] text-gray-500 mt-1">{{ c.vehicle_count }} Vehicle{{ c.vehicle_count|pluralize }}</p>
+                </a>
+                {% empty %}
+                <a href="/company/Tesla/" class="min-w-[140px] bg-[#f6f7f8] border rounded-2xl p-4 text-center"><p class="font-extrabold text-sm">Tesla</p><p class="text-[11px] text-gray-500">USA • Electric</p></a>
+                <a href="/company/Ford/" class="min-w-[140px] bg-[#f6f7f8] border rounded-2xl p-4 text-center"><p class="font-extrabold text-sm">Ford</p><p class="text-[11px] text-gray-500">USA • Mustang</p></a>
+                <a href="/company/Jaguar/" class="min-w-[140px] bg-[#f6f7f8] border rounded-2xl p-4 text-center"><p class="font-extrabold text-sm">Jaguar</p><p class="text-[11px] text-gray-500">UK • Luxury</p></a>
+                <a href="/company/Land Rover/" class="min-w-[140px] bg-[#f6f7f8] border rounded-2xl p-4 text-center"><p class="font-extrabold text-sm">Land Rover</p><p class="text-[11px] text-gray-500">UK • SUV</p></a>
+                <a href="/company/Aston Martin/" class="min-w-[140px] bg-[#f6f7f8] border rounded-2xl p-4 text-center"><p class="font-extrabold text-sm">Aston Martin</p><p class="text-[11px] text-gray-500">UK • Sports</p></a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid US UK - PRICING IN $ -->
+    <div class="max-w-7xl mx-auto px-6 md:px-12 pb-20">
+        <h3 class="font-bold text-lg mb-4">🔥 Live Now - USA & UK - In Dollars ($)</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {% for v in vehicles %}
+            <div class="group bg-white rounded-2xl p-3 shadow-[0_2px_10px_rgba(0,0,0,0.05)] border border-gray-100 hover:shadow-[0_10px_30px_rgba(0,0,0,0.1)] hover:-translate-y-1 transition-all duration-300">
+                <a href="/auctions/{{ v.id }}/">
+                    <div class="relative overflow-hidden rounded-xl">
+                        {% if v.image %}
+                            <img src="{{ v.image.url }}" class="w-full h-[220px] object-cover group-hover:scale-105 transition duration-500">
+                        {% else %}
+                            <div class="w-full h-[220px] bg-gray-100 flex items-center justify-center">🚗 No Image</div>
+                        {% endif %}
+                        {% if v.is_verified %}
+                        <span class="absolute top-3 right-3 bg-blue-600 text-white text-[11px] font-bold px-3 py-1 rounded-full">✓ US/UK Verified</span>
+                        {% endif %}
+                        {% if v.is_sold %}
+                        <span class="absolute top-3 left-3 bg-red-600 text-white text-[11px] font-extrabold px-3 py-1 rounded-full">SOLD 🏆</span>
+                        {% endif %}
+                        <div class="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/50 to-transparent h-20"></div>
+                    </div>
+                </a>
+                <div class="pt-4 px-2 pb-1">
+                    <a href="/auctions/{{ v.id }}/" class="font-bold text-[15px] leading-tight truncate block hover:text-blue-600">{{ v.title }}</a>
+                    <div class="flex justify-between items-center mt-1">
+                        <p class="text-blue-600 font-extrabold text-[15px]">${{ v.price }}</p>
+                        <a href="/company/{{ v.company.name }}/" class="text-[11px] bg-gray-100 hover:bg-blue-100 hover:text-blue-600 px-2.5 py-1 rounded-full font-bold transition">{{ v.company.name }} • US/UK</a>
+                    </div>
+                    <a href="/auctions/{{ v.id }}/" class="text-gray-500 hover:text-blue-600 text-xs mt-2 flex items-center gap-1 font-bold transition">View Details → Live Auction $</a>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

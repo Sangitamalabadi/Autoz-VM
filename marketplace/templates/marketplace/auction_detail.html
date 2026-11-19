@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>{{ auction.vehicle.title }} - AutoZ USA</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>body{font-family:'Inter',sans-serif}</style>
+</head>
+<body class="bg-[#f3f5f8] min-h-screen">
+
+<!-- Navbar -->
+<nav class="bg-white border-b sticky top-0 z-50 backdrop-blur bg-white/90">
+  <div class="max-w-7xl mx-auto px-6 lg:px-8 py-4 flex justify-between items-center">
+    <a href="/" class="font-black text-[24px] tracking-tighter text-[#0f172a]">Auto<span class="text-blue-600">Z</span></a>
+    <div class="flex gap-2">
+      <a href="/" class="font-bold text-sm bg-gray-100 px-4 py-2 rounded-full">Home</a>
+      <a href="/my-bids/" class="font-bold text-sm bg-gray-900 text-white px-5 py-2 rounded-full">My Bids - {{ request.user.username }}</a>
+    </div>
+  </div>
+</nav>
+
+<div class="max-w-7xl mx-auto px-6 lg:px-8 py-8 grid lg:grid-cols-[1.3fr_0.7fr] gap-6">
+
+  <!-- LEFT - Image & Details -->
+  <div class="space-y-6">
+    <!-- Image Card -->
+    <div class="bg-white rounded-[28px] overflow-hidden border border-gray-200/70 shadow-sm">
+      <div class="relative h-[520px] bg-gray-100 group">
+        <img src="{{ auction.vehicle.image.url }}" class="w-full h-full object-cover" />
+        <div class="absolute top-5 left-5 flex gap-2">
+          <span class="bg-white/95 backdrop-blur font-black text-[11px] px-3.5 py-1.5 rounded-full shadow tracking-wider">LIVE AUCTION #{{ auction.id }}</span>
+          <span class="bg-blue-600 text-white font-black text-[11px] px-3.5 py-1.5 rounded-full shadow tracking-wider"><i class="fa-solid fa-circle text-[6px] mr-1 animate-pulse"></i> USA</span>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-black/70 to-transparent p-6 flex items-end justify-between">
+          <p class="text-white font-bold text-sm"><i class="fa-solid fa-location-dot mr-1"></i> {{ auction.vehicle.location|default:"Dallas, TX, USA" }}</p>
+          <p class="text-white/80 text-xs font-bold">VIN: {{ auction.vehicle.vin|default:"SAL...123" }}</p>
+        </div>
+      </div>
+      <div class="p-7">
+        <div class="flex justify-between items-start">
+          <div>
+            <h1 class="text-[28px] font-black tracking-tight leading-none text-gray-900">{{ auction.vehicle.title }}</h1>
+            <p class="text-sm font-semibold text-gray-500 mt-2">{{ auction.vehicle.company.name|upper }} • {{ auction.vehicle.year|default:"2023" }} • {{ auction.vehicle.km|default:"42,000" }} mi • {{ auction.vehicle.fuel|default:"Petrol" }}</p>
+          </div>
+          <span class="bg-gray-900 text-white text-[10px] font-black px-3 py-1.5 rounded-full tracking-widest">CLEAN TITLE</span>
+        </div>
+        <!-- Specs Grid -->
+        <div class="grid grid-cols-4 gap-3 mt-6">
+          <div class="bg-gray-50 border rounded-2xl p-3 text-center"><p class="text-[10px] font-black text-gray-400 tracking-widest">YEAR</p><p class="font-black mt-1">{{ auction.vehicle.year|default:"2023" }}</p></div>
+          <div class="bg-gray-50 border rounded-2xl p-3 text-center"><p class="text-[10px] font-black text-gray-400 tracking-widest">MILEAGE</p><p class="font-black mt-1">{{ auction.vehicle.km|default:"42k" }}</p></div>
+          <div class="bg-gray-50 border rounded-2xl p-3 text-center"><p class="text-[10px] font-black text-gray-400 tracking-widest">ENGINE</p><p class="font-black mt-1">{{ auction.vehicle.engine|default:"3.0L" }}</p></div>
+          <div class="bg-gray-50 border rounded-2xl p-3 text-center"><p class="text-[10px] font-black text-gray-400 tracking-widest">LOT #</p><p class="font-black mt-1">{{ auction.id }}</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT - Bidding Card -->
+  <div class="space-y-4">
+    <div class="bg-white rounded-[28px] p-7 border border-gray-200/70 shadow-[0_20px_40px_-20px_rgba(0,0,0,0.15)] sticky top-24">
+      <div class="flex justify-between items-center">
+        <p class="text-[11px] font-black tracking-[0.2em] text-gray-400">CURRENT BID (USD)</p>
+        <span class="bg-green-50 text-green-600 border border-green-100 text-[10px] font-black px-2.5 py-1 rounded-full"><i class="fa-solid fa-arrow-trend-up mr-1"></i>LIVE</span>
+      </div>
+      <p class="text-[46px] font-black text-blue-600 tracking-tighter mt-2 leading-none">${{ auction.current_price }}</p>
+      <p class="text-xs font-medium text-gray-400 mt-2 line-through">Reserve: ${{ auction.reserve_price|default:"65000" }}</p>
+
+      <!-- Timer -->
+      <div class="mt-6 bg-[#0f172a] rounded-2xl p-4 flex justify-between items-center text-white">
+        <div><p class="text-[10px] font-black tracking-widest text-white/50">AUCTION ENDS</p><p class="font-bold text-sm mt-1">{{ auction.end_time|date:"M d, Y • h:i A" }}</p></div>
+        <div class="bg-white/10 px-3 py-1.5 rounded-full text-xs font-black"><i class="fa-regular fa-clock mr-1"></i> 2d 14h Left</div>
+      </div>
+
+      <!-- Bid Form -->
+      <form method="POST" class="mt-6 space-y-3">
+        {% csrf_token %}
+        <div class="relative">
+          <span class="absolute left-5 top-1/2 -translate-y-1/2 font-black text-gray-400 text-lg">$</span>
+          <input type="number" name="bid_amount" min="{{ auction.current_price|add:1 }}" placeholder="{{ auction.current_price|add:500 }}" class="w-full border-2 border-gray-900 rounded-full pl-10 pr-6 py-4 font-black text-lg focus:border-blue-600 outline-none transition" required>
+        </div>
+        <button class="w-full bg-blue-600 text-white py-4 rounded-full font-black text-[15px] tracking-wide hover:bg-black transition-all duration-300 shadow-[0_10px_20px_-10px_rgba(37,99,235,0.8)]">PLACE BID IN USD <i class="fa-solid fa-gavel ml-2"></i></button>
+        <p class="text-[11px] text-center font-semibold text-gray-400">* Bid in USD ($) - Instant confirmation</p>
+      </form>
+
+      <div class="mt-6 pt-6 border-t border-gray-100">
+        <p class="text-[11px] font-black tracking-widest text-gray-400 mb-3">BID HISTORY ({{ auction.bid_set.count }})</p>
+        <div class="space-y-2 max-h-[120px] overflow-y-auto">
+          {% for bid in auction.bid_set.all|dictsortreversed:"bid_time"|slice:":3" %}
+          <div class="flex justify-between text-xs bg-gray-50 border px-3 py-2 rounded-xl"><span class="font-bold">{{ bid.bidder_name }}</span><span class="font-black text-blue-600">${{ bid.bid_amount }}</span></div>
+          {% empty %}
+          <p class="text-xs text-gray-400 font-medium">No bids yet. Be the first!</p>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
