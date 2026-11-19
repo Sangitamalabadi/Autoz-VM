@@ -362,19 +362,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
 
 
-
-
-# TEMPORARY CLOUDINARY DIAGNOSTICS
-import logging
-from django.core.files.storage import default_storage
-
-logger = logging.getLogger(__name__)
-
-logger.warning(
-    "AUTOZ STORAGE CHECK | "
-    "BACKEND=%s | CLOUD=%s | API_KEY_PRESENT=%s | API_SECRET_PRESENT=%s",
-    default_storage.__class__.__module__ + "." + default_storage.__class__.__name__,
-    bool(CLOUDINARY_STORAGE.get("CLOUD_NAME")),
-    bool(CLOUDINARY_STORAGE.get("API_KEY")),
-    bool(CLOUDINARY_STORAGE.get("API_SECRET")),
-)
