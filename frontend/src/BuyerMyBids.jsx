@@ -2,17 +2,25 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import api, { BACKEND_URL } from './api'
-
 function getImageUrl(image) {
   if (!image) return null
 
-  if (image.startsWith('http://') || image.startsWith('https://')) {
-    return image
+  const normalized = String(image).replace(/\\/g, '/')
+  const filename = normalized.split('/').pop()
+
+  // Use frontend static images for seeded vehicles
+  if (/^[1-7]\.webp$/i.test(filename) && normalized.includes('vehicles')) {
+    return `/vehicles/${filename}`
   }
 
-  return `${BACKEND_URL}${image.startsWith('/') ? '' : '/'}${image}`
-}
+  // Keep external image URLs unchanged
+  if (/^https?:\/\//i.test(normalized)) {
+    return normalized
+  }
 
+  // Fallback to backend for other images
+  return `${BACKEND_URL}${normalized.startsWith('/') ? '' : '/'}${normalized}`
+}
 function formatAmount(amount) {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
