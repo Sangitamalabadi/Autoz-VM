@@ -3675,14 +3675,14 @@ function SellerPortal() {
       </>
     )
   }
-return (
+  return (
   <SellerLoginPanel
     onLogin={handleSellerLogin}
     onCancel={() => navigate('/')}
+    onRegister={() => navigate('/?sellerRegister=1')}
   />
 )
 }
-
 // =====================================================
 // MARKETPLACE
 // =====================================================
@@ -3725,8 +3725,10 @@ function Marketplace() {
   const [registerError, setRegisterError] = useState('')
   const [registerLoading, setRegisterLoading] = useState(false)
     // SELLER REGISTRATION
-  const [showSellerRegister, setShowSellerRegister] = useState(false)
-
+// SELLER REGISTRATION
+const [showSellerRegister, setShowSellerRegister] = useState(
+  () => new URLSearchParams(window.location.search).get('sellerRegister') === '1'
+)
   const [sellerRegisterUsername, setSellerRegisterUsername] = useState('')
   const [sellerRegisterEmail, setSellerRegisterEmail] = useState('')
   const [sellerRegisterPassword, setSellerRegisterPassword] = useState('')
