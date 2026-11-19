@@ -33,7 +33,11 @@ function getImageUrl(image) {
   const normalized = String(image).replace(/\\/g, '/')
   const filename = normalized.split('/').pop()
 
-  if (/^[1-7]\.webp$/i.test(filename) && normalized.includes('vehicles')) {
+  // Use frontend static images for bundled vehicle images
+  if (
+    normalized.toLowerCase().includes('vehicles') &&
+    /^(?:[1-7]|6_zmxq7xz)\.webp$/i.test(filename)
+  ) {
     return `/vehicles/${filename}`
   }
 
