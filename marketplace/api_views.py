@@ -358,6 +358,119 @@ def buyer_register_api(request):
             'message': 'Unable to create Buyer account. Please try again.',
         }, status=500)
 
+# =====================================
+# SELLER REGISTRATION API
+# =====================================
+
+@csrf_protect
+@require_POST
+def seller_register_api(request):
+
+    data = get_request_data(request)
+
+    if data is None:
+        return JsonResponse({
+            'success': False,
+            'message': 'Invalid request data.',
+        }, status=400)
+
+    username = data.get('username', '')
+    email = data.get('email', '')
+    password = data.get('password', '')
+    confirm_password = data.get('confirm_password', '')
+
+    if not all(
+        isinstance(value, str)
+        for value in [
+            username,
+            email,
+            password,
+            confirm_password,
+        ]
+    ):
+        return JsonResponse({
+            'success': False,
+            'message': 'All fields must contain valid text.',
+        }, status=400)
+
+    username = username.strip()
+    email = email.strip().lower()
+
+    if not username or not email or not password or not confirm_password:
+        return JsonResponse({
+            'success': False,
+            'message': 'All fields are required.',
+        }, status=400)
+
+    if len(username) < 3:
+        return JsonResponse({
+            'success': False,
+            'message': 'Username must contain at least 3 characters.',
+        }, status=400)
+
+    if password != confirm_password:
+        return JsonResponse({
+            'success': False,
+            'message': 'Passwords do not match.',
+        }, status=400)
+
+    if User.objects.filter(username__iexact=username).exists():
+        return JsonResponse({
+            'success': False,
+            'message': 'This username is already registered.',
+        }, status=400)
+
+    if User.objects.filter(email__iexact=email).exists():
+        return JsonResponse({
+            'success': False,
+            'message': 'This email is already registered.',
+        }, status=400)
+
+    try:
+        with transaction.atomic():
+
+            user = User(
+                username=username,
+                email=email,
+            )
+
+            password_validation.validate_password(
+                password,
+                user=user,
+            )
+
+            user.set_password(password)
+            user.save()
+
+            seller_group, _ = Group.objects.get_or_create(
+                name='Seller',
+            )
+
+            user.groups.add(seller_group)
+
+        return JsonResponse({
+            'success': True,
+            'message': 'Seller account created successfully. Please login.',
+            'user': {
+                'id': user.id,
+                'username': user.username,
+                'email': user.email,
+                'role': 'Seller',
+            },
+        }, status=201)
+
+    except DjangoValidationError as error:
+        return JsonResponse({
+            'success': False,
+            'message': 'Password validation failed.',
+            'errors': error.messages,
+        }, status=400)
+
+    except Exception:
+        return JsonResponse({
+            'success': False,
+            'message': 'Unable to create Seller account. Please try again.',
+        }, status=500)
 
 # =====================================
 # BUYER LOGIN API

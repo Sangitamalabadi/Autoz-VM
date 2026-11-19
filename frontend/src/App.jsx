@@ -104,7 +104,7 @@ async function getCSRFHeaders() {
 // SELLER LOGIN
 // =====================================================
 
-function SellerLoginPanel({ onLogin, onCancel }) {
+function SellerLoginPanel({ onLogin, onCancel, onRegister }) {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
@@ -230,6 +230,24 @@ function SellerLoginPanel({ onLogin, onCancel }) {
         >
           {loading ? 'Signing in...' : 'Login as Seller'}
         </button>
+
+              <p
+          style={{
+            textAlign: 'center',
+            marginTop: '18px',
+            color: '#555',
+            fontSize: '14px',
+          }}
+        >
+          New seller?{' '}
+          <button
+            type="button"
+            onClick={onRegister}
+            style={textButtonStyle}
+          >
+            Create Seller Account
+          </button>
+        </p>
 
         <button
           type="button"
@@ -3007,6 +3025,7 @@ function AdminBidsDashboard() {
 
   }, [bids, search])
 
+  
   // ---------------------------------------------------
   // DASHBOARD STATISTICS
   // ---------------------------------------------------
@@ -3656,15 +3675,13 @@ function SellerPortal() {
       </>
     )
   }
-
-  return (
-    <SellerLoginPanel
-      onLogin={handleSellerLogin}
-      onCancel={() => navigate('/')}
-    />
-  )
+return (
+  <SellerLoginPanel
+    onLogin={handleSellerLogin}
+    onCancel={() => navigate('/')}
+  />
+)
 }
-
 
 // =====================================================
 // MARKETPLACE
@@ -3707,6 +3724,15 @@ function Marketplace() {
   const [registerConfirmPassword, setRegisterConfirmPassword] = useState('')
   const [registerError, setRegisterError] = useState('')
   const [registerLoading, setRegisterLoading] = useState(false)
+    // SELLER REGISTRATION
+  const [showSellerRegister, setShowSellerRegister] = useState(false)
+
+  const [sellerRegisterUsername, setSellerRegisterUsername] = useState('')
+  const [sellerRegisterEmail, setSellerRegisterEmail] = useState('')
+  const [sellerRegisterPassword, setSellerRegisterPassword] = useState('')
+  const [sellerRegisterConfirmPassword, setSellerRegisterConfirmPassword] = useState('')
+  const [sellerRegisterError, setSellerRegisterError] = useState('')
+  const [sellerRegisterLoading, setSellerRegisterLoading] = useState(false)
 
   const [authMessage, setAuthMessage] = useState('')
 
@@ -3840,7 +3866,22 @@ function Marketplace() {
       block: 'center',
     })
   }
+  const openSellerRegister = () => {
+    setShowSellerRegister(true)
+    setShowSellerLogin(false)
+    setShowLogin(false)
+    setShowRegister(false)
 
+    setSellerRegisterError('')
+    setLoginError('')
+    setRegisterError('')
+    setAuthMessage('')
+
+    document.getElementById('seller-register')?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'center',
+    })
+  }
   // ---------------------------------------------------
   // SELLER LOGIN SUCCESS
   // ---------------------------------------------------
@@ -4001,6 +4042,96 @@ function Marketplace() {
       }
     } finally {
       setRegisterLoading(false)
+    }
+  }
+
+    // ---------------------------------------------------
+  // SELLER REGISTRATION
+  // ---------------------------------------------------
+
+  const handleSellerRegister = async (event) => {
+    event.preventDefault()
+
+    if (sellerRegisterLoading) return
+
+    setSellerRegisterError('')
+    setAuthMessage('')
+
+    const username = sellerRegisterUsername.trim()
+    const email = sellerRegisterEmail.trim()
+
+    if (
+      !username ||
+      !email ||
+      !sellerRegisterPassword ||
+      !sellerRegisterConfirmPassword
+    ) {
+      setSellerRegisterError('Please fill in all registration fields.')
+      return
+    }
+
+    if (username.length < 3) {
+      setSellerRegisterError('Username must contain at least 3 characters.')
+      return
+    }
+
+    if (sellerRegisterPassword !== sellerRegisterConfirmPassword) {
+      setSellerRegisterError('Passwords do not match.')
+      return
+    }
+
+    setSellerRegisterLoading(true)
+
+    try {
+      const headers = await getCSRFHeaders()
+
+      const response = await api.post(
+        'seller/register/',
+        {
+          username,
+          email,
+          password: sellerRegisterPassword,
+          confirm_password: sellerRegisterConfirmPassword,
+        },
+        {
+          headers,
+          withCredentials: true,
+        }
+      )
+
+      if (response.data?.success) {
+        setSellerRegisterUsername('')
+        setSellerRegisterEmail('')
+        setSellerRegisterPassword('')
+        setSellerRegisterConfirmPassword('')
+
+        setShowSellerRegister(false)
+        setShowSellerLogin(true)
+
+        setAuthMessage(
+          'Seller account created successfully! Please log in.'
+        )
+      } else {
+        setSellerRegisterError(
+          response.data?.detail ||
+          response.data?.error ||
+          'Seller registration was unsuccessful.'
+        )
+      }
+    } catch (err) {
+      console.error('SELLER REGISTRATION ERROR:', err)
+
+      setSellerRegisterError(
+        getErrorMessage(err, 'Unable to create your seller account.')
+      )
+
+      if (err.response?.status === 403) {
+        setSellerRegisterError(
+          'CSRF verification failed. Please refresh the page and try again.'
+        )
+      }
+    } finally {
+      setSellerRegisterLoading(false)
     }
   }
 
@@ -4463,15 +4594,144 @@ function Marketplace() {
         </div>
       )}
 
-      {/* SELLER LOGIN PANEL */}
 
-      {showSellerLogin && (
-        <SellerLoginPanel
-          onLogin={handleSellerLoginSuccess}
-          onCancel={() => setShowSellerLogin(false)}
-        />
+
+  {/* SELLER REGISTRATION PANEL */}
+
+      {showSellerRegister && !seller && (
+        <div id="seller-register" style={authPanelStyle}>
+          <h2 style={{ marginTop: 0 }}>Create Seller Account</h2>
+
+          <p style={{ color: '#666' }}>
+            Join AutoZ as a seller and start listing your vehicles.
+          </p>
+
+          <form onSubmit={handleSellerRegister}>
+            <label htmlFor="seller-register-username" style={formLabelStyle}>
+              Username
+            </label>
+
+            <input
+              id="seller-register-username"
+              type="text"
+              value={sellerRegisterUsername}
+              onChange={(event) => setSellerRegisterUsername(event.target.value)}
+              placeholder="Choose a username"
+              autoComplete="username"
+              minLength={3}
+              required
+              style={authInputStyle}
+            />
+
+            <label htmlFor="seller-register-email" style={formLabelStyle}>
+              Email Address
+            </label>
+
+            <input
+              id="seller-register-email"
+              type="email"
+              value={sellerRegisterEmail}
+              onChange={(event) => setSellerRegisterEmail(event.target.value)}
+              placeholder="Enter your email address"
+              autoComplete="email"
+              required
+              style={authInputStyle}
+            />
+
+            <label htmlFor="seller-register-password" style={formLabelStyle}>
+              Password
+            </label>
+
+            <input
+              id="seller-register-password"
+              type="password"
+              value={sellerRegisterPassword}
+              onChange={(event) => setSellerRegisterPassword(event.target.value)}
+              placeholder="Create a password"
+              autoComplete="new-password"
+              required
+              style={authInputStyle}
+            />
+
+            <label
+              htmlFor="seller-register-confirm-password"
+              style={formLabelStyle}
+            >
+              Confirm Password
+            </label>
+
+            <input
+              id="seller-register-confirm-password"
+              type="password"
+              value={sellerRegisterConfirmPassword}
+              onChange={(event) =>
+                setSellerRegisterConfirmPassword(event.target.value)
+              }
+              placeholder="Confirm your password"
+              autoComplete="new-password"
+              required
+              style={authInputStyle}
+            />
+
+            {sellerRegisterError && (
+              <p role="alert" style={errorStyle}>
+                {sellerRegisterError}
+              </p>
+            )}
+
+            <button
+              type="submit"
+              className="primary-button"
+              disabled={sellerRegisterLoading}
+              style={{ width: '100%' }}
+            >
+              {sellerRegisterLoading
+                ? 'Creating Seller Account...'
+                : 'Create Seller Account'}
+            </button>
+
+            <p
+              style={{
+                textAlign: 'center',
+                marginTop: '18px',
+                color: '#555',
+                fontSize: '14px',
+              }}
+            >
+              Already registered as a seller?{' '}
+              <button
+                type="button"
+                onClick={openSellerLogin}
+                style={textButtonStyle}
+              >
+                Log In
+              </button>
+            </p>
+
+            <button
+              type="button"
+              onClick={() => {
+                setShowSellerRegister(false)
+                setSellerRegisterError('')
+              }}
+              style={secondaryButtonStyle}
+            >
+              Cancel
+            </button>
+          </form>
+        </div>
       )}
 
+
+{/* SELLER LOGIN PANEL */}
+
+  {showSellerLogin && (
+  <SellerLoginPanel
+    onLogin={handleSellerLoginSuccess}
+    onCancel={() => setShowSellerLogin(false)}
+    onRegister={openSellerRegister}
+  />
+  )}
       {/* AUTH MESSAGE */}
 
       {authMessage && (

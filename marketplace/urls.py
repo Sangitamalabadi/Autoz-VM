@@ -8,6 +8,7 @@ from .api_views import (
     # AUTHENTICATION APIs
     # =====================================
     csrf_cookie_api,
+    seller_register_api,
     seller_login_api,
     seller_logout_api,
     seller_me_api,
@@ -139,6 +140,12 @@ urlpatterns = [
     # =====================================
     # SELLER AUTHENTICATION APIs
     # =====================================
+    # Seller Registration
+    path(
+        'api/seller/register/',
+        seller_register_api,
+        name='api-seller-register'
+    ),
 
     path(
         'api/auth/login/',
