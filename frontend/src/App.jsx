@@ -3867,21 +3867,21 @@ function Marketplace() {
     })
   }
   const openSellerRegister = () => {
-    setShowSellerRegister(true)
-    setShowSellerLogin(false)
-    setShowLogin(false)
-    setShowRegister(false)
+  setShowSellerRegister(true)
+  setShowSellerLogin(false)
+  setShowLogin(false)
+  setShowRegister(false)
 
-    setSellerRegisterError('')
-    setLoginError('')
-    setRegisterError('')
-    setAuthMessage('')
+  setSellerRegisterError('')
+  setLoginError('')
+  setRegisterError('')
+  setAuthMessage('')
 
-    document.getElementById('seller-register')?.scrollIntoView({
-      behavior: 'smooth',
-      block: 'center',
-    })
-  }
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth',
+  })
+}
   // ---------------------------------------------------
   // SELLER LOGIN SUCCESS
   // ---------------------------------------------------
