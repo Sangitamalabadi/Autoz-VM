@@ -80,9 +80,10 @@ class Vehicle(models.Model):
     )
 
     description = models.TextField()
-
+    
     image = models.ImageField(
-        upload_to='vehicles/'
+    upload_to='vehicle_images/',
+    max_length=500
     )
 
     owner = models.CharField(
