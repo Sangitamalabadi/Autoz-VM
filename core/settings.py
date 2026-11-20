@@ -2,7 +2,7 @@
 """
 Django settings for AutoZ project.
 
-Development: SQLite + Local Media Storage (fallback)
+Development: SQLite + Local Media Storage
 Production: PostgreSQL + Cloudinary (Render)
 """
 
@@ -24,8 +24,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ENVIRONMENT CONFIGURATION
 # --------------------------------------------------
 
-# Load environment variables from project root .env
-# Existing system environment variables take precedence.
 load_dotenv(BASE_DIR / ".env")
 
 DEBUG = os.environ.get("DEBUG", "True").lower() in (
@@ -57,6 +55,16 @@ ALLOWED_HOSTS = [
     ).split(",")
     if host.strip()
 ]
+
+# Automatically allow Render's assigned hostname.
+RENDER_EXTERNAL_HOSTNAME = os.environ.get(
+    "RENDER_EXTERNAL_HOSTNAME",
+    "",
+).strip()
+
+if RENDER_EXTERNAL_HOSTNAME:
+    if RENDER_EXTERNAL_HOSTNAME not in ALLOWED_HOSTS:
+        ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
 
 SECURE_PROXY_SSL_HEADER = (
     "HTTP_X_FORWARDED_PROTO",
@@ -138,7 +146,6 @@ CLOUDINARY_STORAGE = {
     "API_SECRET": CLOUDINARY_API_SECRET,
 }
 
-# Production must have valid Cloudinary configuration.
 if not DEBUG and not CLOUDINARY_CONFIGURED:
     raise ValueError(
         "Cloudinary credentials must be configured in production."
@@ -209,6 +216,7 @@ ROOT_URLCONF = "core.urls"
 # --------------------------------------------------
 # TEMPLATES
 # --------------------------------------------------
+
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
@@ -239,7 +247,10 @@ WSGI_APPLICATION = "core.wsgi.application"
 # DATABASE CONFIGURATION
 # --------------------------------------------------
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "",
+).strip()
 
 if DATABASE_URL:
     DATABASES = {
@@ -326,10 +337,6 @@ MEDIA_ROOT = BASE_DIR / "media"
 # MEDIA STORAGE CONFIGURATION
 # --------------------------------------------------
 
-# Cloudinary is used when credentials are configured.
-# Local filesystem storage is used when credentials
-# are missing during local development.
-
 if CLOUDINARY_CONFIGURED:
     MEDIA_STORAGE_BACKEND = (
         "cloudinary_storage.storage.MediaCloudinaryStorage"
@@ -368,10 +375,16 @@ EMAIL_BACKEND = (
 FRONTEND_URL = os.environ.get(
     "FRONTEND_URL",
     "http://localhost:5173",
-).rstrip("/")
+).strip().rstrip("/")
 
+# Support one or more frontend URLs separated by commas.
 CORS_ALLOWED_ORIGINS = [
-    FRONTEND_URL,
+    origin.strip().rstrip("/")
+    for origin in os.environ.get(
+        "CORS_ALLOWED_ORIGINS",
+        FRONTEND_URL,
+    ).split(",")
+    if origin.strip()
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -382,24 +395,42 @@ CORS_ALLOW_CREDENTIALS = True
 # --------------------------------------------------
 
 CSRF_TRUSTED_ORIGINS = [
-    FRONTEND_URL,
+    origin.strip().rstrip("/")
+    for origin in os.environ.get(
+        "CSRF_TRUSTED_ORIGINS",
+        FRONTEND_URL,
+    ).split(",")
+    if origin.strip()
 ]
 
-if DEBUG:
-    CORS_ALLOWED_ORIGINS.extend([
-        "http://127.0.0.1:5173",
-    ])
 
-    CSRF_TRUSTED_ORIGINS.extend([
+# --------------------------------------------------
+# LOCAL DEVELOPMENT CORS / CSRF
+# --------------------------------------------------
+
+if DEBUG:
+
+    LOCAL_FRONTEND_ORIGINS = [
+        "http://localhost:5173",
         "http://127.0.0.1:5173",
-    ])
+    ]
+
+    for origin in LOCAL_FRONTEND_ORIGINS:
+
+        if origin not in CORS_ALLOWED_ORIGINS:
+            CORS_ALLOWED_ORIGINS.append(origin)
+
+        if origin not in CSRF_TRUSTED_ORIGINS:
+            CSRF_TRUSTED_ORIGINS.append(origin)
 
 
 # --------------------------------------------------
 # SESSION CONFIGURATION
 # --------------------------------------------------
 
-SESSION_ENGINE = "django.contrib.sessions.backends.db"
+SESSION_ENGINE = (
+    "django.contrib.sessions.backends.db"
+)
 
 SESSION_COOKIE_AGE = 1209600
 
