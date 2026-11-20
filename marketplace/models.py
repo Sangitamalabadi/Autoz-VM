@@ -1,4 +1,3 @@
-
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -45,7 +44,13 @@ class Vehicle(models.Model):
         ('REJECTED', 'Rejected'),
     ]
 
-    title = models.CharField(max_length=200)
+    # =====================================
+    # BASIC VEHICLE INFORMATION
+    # =====================================
+
+    title = models.CharField(
+        max_length=200
+    )
 
     company = models.ForeignKey(
         Company,
@@ -53,7 +58,9 @@ class Vehicle(models.Model):
         related_name='vehicles'
     )
 
-    model_name = models.CharField(max_length=100)
+    model_name = models.CharField(
+        max_length=100
+    )
 
     price = models.DecimalField(
         max_digits=10,
@@ -80,11 +87,53 @@ class Vehicle(models.Model):
     )
 
     description = models.TextField()
-    
-    image = models.ImageField(
-    upload_to='vehicle_images/',
-    max_length=500
+
+    # =====================================
+    # VEHICLE PICKUP LOCATION
+    # =====================================
+
+    street_address = models.CharField(
+        max_length=255,
+        blank=True,
+        default=''
     )
+
+    city = models.CharField(
+        max_length=100,
+        blank=True,
+        default=''
+    )
+
+    state = models.CharField(
+        max_length=100,
+        blank=True,
+        default=''
+    )
+
+    postal_code = models.CharField(
+        max_length=20,
+        blank=True,
+        default=''
+    )
+
+    country = models.CharField(
+        max_length=100,
+        blank=True,
+        default=''
+    )
+
+    # =====================================
+    # VEHICLE IMAGE
+    # =====================================
+
+    image = models.ImageField(
+        upload_to='vehicles/',
+        max_length=500
+    )
+
+    # =====================================
+    # VEHICLE OWNERSHIP
+    # =====================================
 
     owner = models.CharField(
         max_length=50,
@@ -92,7 +141,10 @@ class Vehicle(models.Model):
         default='1st Owner'
     )
 
-    # Seller Information
+    # =====================================
+    # SELLER INFORMATION
+    # =====================================
+
     seller = models.ForeignKey(
         User,
         on_delete=models.SET_NULL,
@@ -101,7 +153,10 @@ class Vehicle(models.Model):
         related_name='vehicle_listings'
     )
 
-    # Admin Listing Approval
+    # =====================================
+    # ADMIN LISTING APPROVAL
+    # =====================================
+
     listing_status = models.CharField(
         max_length=20,
         choices=LISTING_STATUS,
@@ -113,16 +168,37 @@ class Vehicle(models.Model):
         default=''
     )
 
-    # Vehicle Verification
-    is_verified = models.BooleanField(default=False)
+    # =====================================
+    # VEHICLE VERIFICATION
+    # =====================================
 
-    # Vehicle Sale Status
-    is_sold = models.BooleanField(default=False)
+    is_verified = models.BooleanField(
+        default=False
+    )
 
-    # Timestamps
-    created_at = models.DateTimeField(auto_now_add=True)
+    # =====================================
+    # VEHICLE SALE STATUS
+    # =====================================
 
-    updated_at = models.DateTimeField(auto_now=True)
+    is_sold = models.BooleanField(
+        default=False
+    )
+
+    # =====================================
+    # TIMESTAMPS
+    # =====================================
+
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
+
+    updated_at = models.DateTimeField(
+        auto_now=True
+    )
+
+    # =====================================
+    # HELPER PROPERTY
+    # =====================================
 
     @property
     def company_name(self):
@@ -145,7 +221,8 @@ class VehicleImage(models.Model):
     )
 
     image = models.ImageField(
-        upload_to='vehicles/gallery/'
+        upload_to='vehicles/gallery/',
+        max_length=500
     )
 
     uploaded_at = models.DateTimeField(
@@ -180,7 +257,9 @@ class Auction(models.Model):
 
     end_time = models.DateTimeField()
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(
+        default=True
+    )
 
     def __str__(self):
         return f"Auction - {self.vehicle.title}"
@@ -209,15 +288,21 @@ class Bid(models.Model):
     )
 
     # Display name (also supports guest bidding).
-    bidder_name = models.CharField(max_length=100)
+    bidder_name = models.CharField(
+        max_length=100
+    )
 
     bid_amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(0.01)]
+        validators=[
+            MinValueValidator(0.01)
+        ]
     )
 
-    bid_time = models.DateTimeField(auto_now_add=True)
+    bid_time = models.DateTimeField(
+        auto_now_add=True
+    )
 
     @property
     def is_highest_bid(self):
@@ -262,9 +347,13 @@ class VehicleVerification(models.Model):
         verbose_name="Accident?"
     )
 
-    odometer_verified = models.BooleanField(default=True)
+    odometer_verified = models.BooleanField(
+        default=True
+    )
 
-    is_verified = models.BooleanField(default=True)
+    is_verified = models.BooleanField(
+        default=True
+    )
 
     def __str__(self):
         status = 'Verified' if self.is_verified else 'Pending'
@@ -314,7 +403,9 @@ class Ticket(models.Model):
         choices=STATUS_CHOICES
     )
 
-    created_at = models.DateTimeField(auto_now_add=True)
+    created_at = models.DateTimeField(
+        auto_now_add=True
+    )
 
     def __str__(self):
         return f"Ticket #{self.id} - {self.vehicle.title} - {self.status}"
@@ -543,7 +634,6 @@ class VehicleImage(models.Model):
     def __str__(self):
         return f"Image - {self.vehicle.title}"
 
-
 # =====================================
 # AUCTION MODEL
 # =====================================
@@ -568,7 +658,9 @@ class Auction(models.Model):
 
     end_time = models.DateTimeField()
 
-    is_active = models.BooleanField(default=True)
+    is_active = models.BooleanField(
+        default=True
+    )
 
     def __str__(self):
         return f"Auction - {self.vehicle.title}"
@@ -597,12 +689,16 @@ class Bid(models.Model):
     )
 
     # Display name (also supports guest bidding).
-    bidder_name = models.CharField(max_length=100)
+    bidder_name = models.CharField(
+        max_length=100
+    )
 
     bid_amount = models.DecimalField(
         max_digits=10,
         decimal_places=2,
-        validators=[MinValueValidator(0.01)]
+        validators=[
+            MinValueValidator(0.01)
+        ]
     )
 
     bid_time = models.DateTimeField(
@@ -623,7 +719,6 @@ class Bid(models.Model):
 
     def __str__(self):
         return f"{self.bidder_name} - ${self.bid_amount}"
-
 
 # =====================================
 # VEHICLE VERIFICATION MODEL
