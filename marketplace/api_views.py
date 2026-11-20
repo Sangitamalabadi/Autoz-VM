@@ -1197,6 +1197,73 @@ class BuyerMyBidsAPI(generics.ListAPIView):
             '-id',
         )
 
+# =====================================
+# ADMIN LOGIN API
+# =====================================
+
+@csrf_protect
+@require_POST
+def admin_login_api(request):
+
+    data = get_request_data(request)
+
+    if data is None:
+        return JsonResponse({
+            'success': False,
+            'message': 'Invalid request data.',
+        }, status=400)
+
+    username = data.get('username', '')
+    password = data.get('password', '')
+
+    if not isinstance(username, str) or not isinstance(password, str):
+        return JsonResponse({
+            'success': False,
+            'message': 'Invalid credentials format.',
+        }, status=400)
+
+    username = username.strip()
+
+    if not username or not password:
+        return JsonResponse({
+            'success': False,
+            'message': 'Username and password are required.',
+        }, status=400)
+
+    user = authenticate(
+        request,
+        username=username,
+        password=password,
+    )
+
+    if user is None:
+        return JsonResponse({
+            'success': False,
+            'message': 'Invalid username or password.',
+        }, status=401)
+
+    if not user.is_staff:
+        return JsonResponse({
+            'success': False,
+            'message': 'Admin access is restricted.',
+        }, status=403)
+
+    login(request, user)
+
+    csrf_token = get_token(request)
+
+    return JsonResponse({
+        'success': True,
+        'message': 'Admin login successful.',
+        'csrfToken': csrf_token,
+        'user': {
+            'id': user.id,
+            'username': user.username,
+            'is_staff': user.is_staff,
+            'is_superuser': user.is_superuser,
+        },
+    })
+
 
 # =====================================
 # ADMIN - ALL BIDS API

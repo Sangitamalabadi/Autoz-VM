@@ -12,6 +12,7 @@ const TICKET_TYPES = [
   { value: 'VEHICLE', label: 'Vehicle Not As Described' },
   { value: 'OTHER', label: 'Other' },
 ]
+
 function getImageUrl(image) {
   if (!image) return ''
 
@@ -103,6 +104,68 @@ function isAuctionEnded(auction) {
   )
 }
 
+// =====================================
+// VEHICLE LOCATION HELPER
+// =====================================
+
+function getVehicleLocation(vehicle) {
+  if (!vehicle) return {}
+
+  const nestedLocation =
+    typeof vehicle.location === 'object' && vehicle.location !== null
+      ? vehicle.location
+      : {}
+
+  const seller = vehicle.seller || {}
+
+  return {
+    address:
+      vehicle.full_address ||
+      vehicle.address ||
+      vehicle.pickup_address ||
+      vehicle.vehicle_address ||
+      nestedLocation.full_address ||
+      nestedLocation.address ||
+      '',
+
+    city:
+      vehicle.city ||
+      vehicle.city_name ||
+      nestedLocation.city ||
+      '',
+
+    state:
+      vehicle.state ||
+      vehicle.state_name ||
+      vehicle.province ||
+      nestedLocation.state ||
+      nestedLocation.province ||
+      '',
+
+    postalCode:
+      vehicle.zip_code ||
+      vehicle.postal_code ||
+      vehicle.postcode ||
+      vehicle.zip ||
+      nestedLocation.zip_code ||
+      nestedLocation.postal_code ||
+      '',
+
+    country:
+      vehicle.country ||
+      vehicle.country_name ||
+      nestedLocation.country ||
+      '',
+
+    pickupLocation:
+      vehicle.pickup_location ||
+      vehicle.location_name ||
+      (typeof vehicle.location === 'string' ? vehicle.location : '') ||
+      seller.business_address ||
+      '',
+  }
+}
+
 function VehicleDetails() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -114,6 +177,9 @@ function VehicleDetails() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [imageError, setImageError] = useState(false)
+
+  // Gallery state
+  const [activeImageIndex, setActiveImageIndex] = useState(0)
 
   const [bidderName, setBidderName] = useState('')
   const [bidAmount, setBidAmount] = useState('')
@@ -128,6 +194,80 @@ function VehicleDetails() {
   const [reportSuccess, setReportSuccess] = useState('')
 
   const [auctionTime, setAuctionTime] = useState(Date.now())
+
+  // =====================================
+  // VEHICLE LOCATION
+  // =====================================
+
+  const vehicleLocation = getVehicleLocation(vehicle)
+
+  const hasVehicleLocation = Boolean(
+    vehicleLocation.address ||
+    vehicleLocation.city ||
+    vehicleLocation.state ||
+    vehicleLocation.postalCode ||
+    vehicleLocation.country ||
+    vehicleLocation.pickupLocation
+  )
+
+  // =====================================
+  // VEHICLE IMAGE GALLERY
+  // =====================================
+
+  const galleryImages = useMemo(() => {
+    if (!vehicle) return []
+
+    const images = []
+
+    if (vehicle.image) {
+      images.push({
+        id: 'main',
+        image: vehicle.image,
+        label: 'Main Photo',
+      })
+    }
+
+    if (Array.isArray(vehicle.additional_images)) {
+      vehicle.additional_images.forEach((item, index) => {
+        if (item?.image) {
+          images.push({
+            id: item.id ?? `additional-${index}`,
+            image: item.image,
+            label: `Photo ${index + 2}`,
+          })
+        }
+      })
+    }
+
+    return images
+  }, [vehicle])
+
+  const activeImage = galleryImages[activeImageIndex]
+
+  const goToNextImage = useCallback(() => {
+    if (galleryImages.length <= 1) return
+
+    setImageError(false)
+
+    setActiveImageIndex((previous) =>
+      (previous + 1) % galleryImages.length
+    )
+  }, [galleryImages.length])
+
+  const goToPreviousImage = useCallback(() => {
+    if (galleryImages.length <= 1) return
+
+    setImageError(false)
+
+    setActiveImageIndex((previous) =>
+      (previous - 1 + galleryImages.length) % galleryImages.length
+    )
+  }, [galleryImages.length])
+
+  const selectImage = useCallback((index) => {
+    setActiveImageIndex(index)
+    setImageError(false)
+  }, [])
 
   // =====================================
   // AUCTION SELECTION
@@ -171,6 +311,9 @@ function VehicleDetails() {
     setVehicle(vehicleData)
     setAuction(matchingAuction)
 
+    setActiveImageIndex(0)
+    setImageError(false)
+
     setBids(
       Array.isArray(matchingAuction?.bids)
         ? matchingAuction.bids
@@ -186,6 +329,7 @@ function VehicleDetails() {
         setLoading(true)
         setError('')
         setImageError(false)
+        setActiveImageIndex(0)
 
         await loadDetails()
       } catch (err) {
@@ -238,7 +382,10 @@ function VehicleDetails() {
   }, [auction, vehicle, auctionTime])
 
   const currentPrice = Number(
-    auction?.current_price ?? auction?.base_price ?? vehicle?.price ?? 0
+    auction?.current_price ??
+    auction?.base_price ??
+    vehicle?.price ??
+    0
   )
 
   const minimumBid = currentPrice + 1000
@@ -470,56 +617,124 @@ function VehicleDetails() {
       </div>
     )
   }
+// VEHICLE LOCATION HELPER //
 
-  // =====================================
-  // ERROR
-  // =====================================
+function getVehicleLocation(vehicle) {
+  if (!vehicle) return {}
 
-  if (error || !vehicle) {
-    return (
-      <div className="details-state">
-        <h2>{error || 'Vehicle not found'}</h2>
+  const nestedLocation =
+    typeof vehicle.location === 'object' &&
+    vehicle.location !== null
+      ? vehicle.location
+      : {}
 
-        <button onClick={() => navigate('/')}>
-          Back to Marketplace
-        </button>
-      </div>
-    )
+  const seller = vehicle.seller || {}
+
+  return {
+    address:
+      vehicle.street_address ||
+      vehicle.full_address ||
+      vehicle.address ||
+      vehicle.pickup_address ||
+      vehicle.vehicle_address ||
+      nestedLocation.street_address ||
+      nestedLocation.full_address ||
+      nestedLocation.address ||
+      '',
+
+    city:
+      vehicle.city ||
+      vehicle.city_name ||
+      nestedLocation.city ||
+      '',
+
+    state:
+      vehicle.state ||
+      vehicle.state_name ||
+      vehicle.province ||
+      nestedLocation.state ||
+      nestedLocation.province ||
+      '',
+
+    postalCode:
+      vehicle.postal_code ||
+      vehicle.zip_code ||
+      vehicle.postcode ||
+      vehicle.zip ||
+      nestedLocation.postal_code ||
+      nestedLocation.zip_code ||
+      '',
+
+    country:
+      vehicle.country ||
+      vehicle.country_name ||
+      nestedLocation.country ||
+      '',
+
+    pickupLocation:
+      vehicle.pickup_location ||
+      vehicle.location_name ||
+      (typeof vehicle.location === 'string'
+        ? vehicle.location
+        : '') ||
+      seller.business_address ||
+      '',
   }
+}
+// =====================================
+// ERROR
+// =====================================
 
-  // =====================================
-  // MAIN UI
-  // =====================================
-
+if (error || !vehicle) {
   return (
-    <div className="details-page">
+    <div className="details-state">
+      <h2>{error || 'Vehicle not found'}</h2>
 
-      <header className="details-header">
-        <button
-          onClick={() => navigate('/')}
-          className="back-button"
-        >
-          ← Back to Vehicles
-        </button>
+      <button onClick={() => navigate('/')}>
+        Back to Marketplace
+      </button>
+    </div>
+  )
+}
 
-        <div className="details-logo">
-          AUTO<span>Z</span>
-        </div>
 
-        <span className="header-market-label">
-          US & UK MARKETPLACE
-        </span>
-      </header>
+// =====================================
+// MAIN UI
+// =====================================
 
-      <main className="details-container">
+return (
+  <div className="details-page">
 
-        {/* VEHICLE IMAGE */}
+    <header className="details-header">
+      <button
+        onClick={() => navigate('/')}
+        className="back-button"
+      >
+        ← Back to Vehicles
+      </button>
 
-        <section className="details-image-section">
-          {vehicle.image && !imageError ? (
+      <div className="details-logo">
+        AUTO<span>Z</span>
+      </div>
+
+      <span className="header-market-label">
+        US & UK MARKETPLACE
+      </span>
+    </header>
+
+    <main className="details-container">
+
+      {/* VEHICLE IMAGE GALLERY */}
+
+      <section className="details-image-section">
+
+        <div className="details-gallery-main">
+
+          {activeImage && !imageError ? (
             <img
-              src={getImageUrl(vehicle.image)}
-              alt={vehicle.title || 'Vehicle'}
+              key={activeImage.id}
+              src={getImageUrl(activeImage.image)}
+              alt={`${vehicle.title || 'Vehicle'} - ${activeImage.label}`}
               className="details-main-image"
               onError={() => setImageError(true)}
             />
@@ -527,6 +742,34 @@ function VehicleDetails() {
             <div className="details-no-image">
               AUTOZ
             </div>
+          )}
+
+          {/* GALLERY NAVIGATION */}
+
+          {galleryImages.length > 1 && (
+            <>
+              <button
+                type="button"
+                className="gallery-arrow gallery-prev"
+                onClick={goToPreviousImage}
+                aria-label="Previous photo"
+              >
+                ‹
+              </button>
+
+              <button
+                type="button"
+                className="gallery-arrow gallery-next"
+                onClick={goToNextImage}
+                aria-label="Next photo"
+              >
+                ›
+              </button>
+
+              <div className="gallery-counter">
+                {activeImageIndex + 1} / {galleryImages.length}
+              </div>
+            </>
           )}
 
           <span className="details-verified">
@@ -538,67 +781,189 @@ function VehicleDetails() {
           <div className="image-caption">
             Premium Vehicle Collection
           </div>
-        </section>
 
-        {/* VEHICLE INFORMATION */}
+        </div>
 
-        <section className="details-information">
+        {/* ALL PHOTO THUMBNAILS */}
 
-          <span className="details-company">
-            {vehicle.company_name || vehicle.company?.name || 'PREMIUM AUTOMOTIVE'}
-          </span>
+        {galleryImages.length > 1 && (
+          <div className="details-gallery-thumbnails">
 
-          <h1>{vehicle.title}</h1>
+            {galleryImages.map((photo, index) => (
+              <button
+                type="button"
+                key={photo.id}
+                className={`gallery-thumbnail ${
+                  activeImageIndex === index ? 'active' : ''
+                }`}
+                onClick={() => selectImage(index)}
+                aria-label={`View photo ${index + 1}`}
+                aria-current={
+                  activeImageIndex === index ? 'true' : undefined
+                }
+              >
+                <img
+                  src={getImageUrl(photo.image)}
+                  alt={`${vehicle.title || 'Vehicle'} thumbnail ${index + 1}`}
+                />
 
-          <div className="details-price">
-            {formatPrice(vehicle.price)}
+                <span className="thumbnail-number">
+                  {index + 1}
+                </span>
+              </button>
+            ))}
+
           </div>
+        )}
 
-          <span className={
+      </section>
+
+
+      {/* VEHICLE INFORMATION */}
+
+      <section className="details-information">
+
+        <span className="details-company">
+          {vehicle.company_name ||
+            vehicle.company?.name ||
+            'PREMIUM AUTOMOTIVE'}
+        </span>
+
+        <h1>{vehicle.title}</h1>
+
+        <div className="details-price">
+          {formatPrice(vehicle.price)}
+        </div>
+
+        <span
+          className={
             vehicle.is_sold
               ? 'details-status sold'
               : 'details-status available'
-          }>
-            {vehicle.is_sold ? 'SOLD' : 'AVAILABLE'}
-          </span>
+          }
+        >
+          {vehicle.is_sold ? 'SOLD' : 'AVAILABLE'}
+        </span>
 
-          <h2>Vehicle Specifications</h2>
 
-          <div className="specifications-grid">
+        {/* SPECIFICATIONS */}
 
-            <div className="specification">
-              <span>Year</span>
-              <strong>{vehicle.year || 'N/A'}</strong>
-            </div>
+        <h2>Vehicle Specifications</h2>
 
-            <div className="specification">
-              <span>Model</span>
-              <strong>{vehicle.model_name || 'N/A'}</strong>
-            </div>
+        <div className="specifications-grid">
 
-            <div className="specification">
-              <span>Mileage</span>
-              <strong>{formatMileage(vehicle.km_driven)}</strong>
-            </div>
-
-            <div className="specification">
-              <span>Category</span>
-              <strong>{vehicle.category || 'N/A'}</strong>
-            </div>
-
-            <div className="specification">
-              <span>Ownership</span>
-              <strong>{vehicle.owner || 'N/A'}</strong>
-            </div>
-
-            <div className="specification">
-              <span>Verification</span>
-              <strong>
-                {vehicle.is_verified ? 'Verified' : 'Pending'}
-              </strong>
-            </div>
-
+          <div className="specification">
+            <span>Year</span>
+            <strong>{vehicle.year || 'N/A'}</strong>
           </div>
+
+          <div className="specification">
+            <span>Model</span>
+            <strong>{vehicle.model_name || 'N/A'}</strong>
+          </div>
+
+          <div className="specification">
+            <span>Mileage</span>
+            <strong>{formatMileage(vehicle.km_driven)}</strong>
+          </div>
+
+          <div className="specification">
+            <span>Category</span>
+            <strong>{vehicle.category || 'N/A'}</strong>
+          </div>
+
+          <div className="specification">
+            <span>Ownership</span>
+            <strong>{vehicle.owner || 'N/A'}</strong>
+          </div>
+
+          <div className="specification">
+            <span>Verification</span>
+            <strong>
+              {vehicle.is_verified ? 'Verified' : 'Pending'}
+            </strong>
+          </div>
+
+        </div>
+          {/* =====================================
+               VEHICLE LOCATION / ADDRESS
+          ====================================== */}
+
+          <section className="vehicle-location-section">
+
+            <div className="vehicle-location-heading">
+              <span className="location-icon">📍</span>
+
+              <div>
+                <span className="section-eyebrow">
+                  VEHICLE LOCATION
+                </span>
+
+                <h2>Pickup Location</h2>
+              </div>
+            </div>
+
+            {hasVehicleLocation ? (
+              <div className="vehicle-location-card">
+
+                {vehicleLocation.address && (
+                  <div className="vehicle-location-address">
+                    <strong>Street Address</strong>
+                    <p>{vehicleLocation.address}</p>
+                  </div>
+                )}
+
+                {(vehicleLocation.city || vehicleLocation.state) && (
+                  <div className="vehicle-location-row">
+                    <div className="vehicle-location-item">
+                      <span>City</span>
+                      <strong>
+                        {vehicleLocation.city || 'Not provided'}
+                      </strong>
+                    </div>
+
+                    <div className="vehicle-location-item">
+                      <span>State / Province</span>
+                      <strong>
+                        {vehicleLocation.state || 'Not provided'}
+                      </strong>
+                    </div>
+                  </div>
+                )}
+
+                {vehicleLocation.postalCode && (
+                  <div className="vehicle-location-item">
+                    <span>ZIP / Postal Code</span>
+                    <strong>{vehicleLocation.postalCode}</strong>
+                  </div>
+                )}
+
+                {vehicleLocation.country && (
+                  <div className="vehicle-location-item">
+                    <span>Country</span>
+                    <strong>{vehicleLocation.country}</strong>
+                  </div>
+                )}
+
+                {vehicleLocation.pickupLocation &&
+                  vehicleLocation.pickupLocation !== vehicleLocation.address && (
+                    <div className="vehicle-location-address">
+                      <strong>Pickup Details</strong>
+                      <p>{vehicleLocation.pickupLocation}</p>
+                    </div>
+                  )}
+
+              </div>
+            ) : (
+              <div className="vehicle-location-unavailable">
+                <span>📍</span>
+                <p>
+                  Location details have not been provided for this vehicle.
+                </p>
+              </div>
+            )}
+
+          </section>
 
           {/* DESCRIPTION */}
 

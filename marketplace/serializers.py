@@ -30,11 +30,14 @@ class CompanySerializer(serializers.ModelSerializer):
 # ==========================================
 # VEHICLE IMAGE SERIALIZER
 # ==========================================
+# ==========================================
+# VEHICLE IMAGE SERIALIZER
+# ==========================================
 
 class VehicleImageSerializer(serializers.ModelSerializer):
 
     class Meta:
-        model = VehicleImage
+        model = VehicleImage  # ✅ Correct model
 
         fields = [
             'id',
@@ -46,7 +49,6 @@ class VehicleImageSerializer(serializers.ModelSerializer):
             'id',
             'uploaded_at',
         ]
-
 
 # ==========================================
 # VEHICLE SERIALIZER
@@ -87,12 +89,27 @@ class VehicleSerializer(serializers.ModelSerializer):
             'category',
             'description',
             'owner',
+
+            # Pickup Location
+            'street_address',
+            'city',
+            'state',
+            'postal_code',
+            'country',
+
+            # Seller Information
             'seller',
             'seller_username',
+
+            # Listing Status
             'listing_status',
             'rejection_reason',
+
+            # Verification & Sale
             'is_verified',
             'is_sold',
+
+            # Timestamps
             'created_at',
             'updated_at',
         ]
@@ -111,7 +128,7 @@ class VehicleSerializer(serializers.ModelSerializer):
 
 
 # ==========================================
-# VEHICLE CREATE SERIALIZER
+# VEHICLE CREATE / UPDATE SERIALIZER
 # ==========================================
 
 class VehicleCreateSerializer(serializers.ModelSerializer):
@@ -138,6 +155,13 @@ class VehicleCreateSerializer(serializers.ModelSerializer):
             'category',
             'description',
             'owner',
+
+            # Pickup Location
+            'street_address',
+            'city',
+            'state',
+            'postal_code',
+            'country',
         ]
 
     # --------------------------------------
@@ -154,6 +178,17 @@ class VehicleCreateSerializer(serializers.ModelSerializer):
             + len(additional_images)
         )
 
+        # During update, existing main image may be retained.
+        if self.instance:
+            existing_main_image = bool(
+                self.instance.image
+            )
+
+            if not main_image and existing_main_image:
+                total_images = (
+                    1 + len(additional_images)
+                )
+
         if total_images > 15:
             raise serializers.ValidationError({
                 'images': (
@@ -162,7 +197,7 @@ class VehicleCreateSerializer(serializers.ModelSerializer):
                 )
             })
 
-        if total_images < 1:
+        if not self.instance and total_images < 1:
             raise serializers.ValidationError({
                 'image': 'At least one vehicle image is required.'
             })
@@ -199,6 +234,41 @@ class VehicleCreateSerializer(serializers.ModelSerializer):
             )
 
         return vehicle
+
+    # --------------------------------------
+    # UPDATE VEHICLE + GALLERY
+    # --------------------------------------
+
+    @transaction.atomic
+    def update(self, instance, validated_data):
+
+        additional_images = validated_data.pop(
+            'images',
+            None
+        )
+
+        # Update vehicle fields including location.
+        for field, value in validated_data.items():
+            setattr(instance, field, value)
+
+        instance.save()
+
+        # If new additional images are provided,
+        # append them to the existing gallery.
+        if additional_images:
+            gallery_objects = [
+                VehicleImage(
+                    vehicle=instance,
+                    image=image
+                )
+                for image in additional_images
+            ]
+
+            VehicleImage.objects.bulk_create(
+                gallery_objects
+            )
+
+        return instance
 
 
 # ==========================================

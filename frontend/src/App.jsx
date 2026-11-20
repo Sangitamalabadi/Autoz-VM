@@ -290,33 +290,44 @@ function SellerDashboard({ seller, onLogout }) {
   const [newImages, setNewImages] = useState([])
   const [uploadingImages, setUploadingImages] = useState(false)
   const [deletingImageId, setDeletingImageId] = useState(null)
+const [form, setForm] = useState({
+  title: '',
+  company: '',
+  model_name: '',
+  price: '',
+  year: '',
+  miles: '',
+  category: 'Car',
+  description: '',
+  owner: '1st Owner',
 
-  const [form, setForm] = useState({
-    title: '',
-    company: '',
-    model_name: '',
-    price: '',
-    year: '',
-    miles: '',
-    category: 'Car',
-    description: '',
-    owner: '1st Owner',
-  })
+  // Pickup Location
+  street_address: '',
+  city: '',
+  state: '',
+  postal_code: '',
+  country: '',
+})
+const [images, setImages] = useState([])
 
-  const [images, setImages] = useState([])
+const [editForm, setEditForm] = useState({
+  title: '',
+  company: '',
+  model_name: '',
+  price: '',
+  year: '',
+  miles: '',
+  category: 'Car',
+  description: '',
+  owner: '1st Owner',
 
-  const [editForm, setEditForm] = useState({
-    title: '',
-    company: '',
-    model_name: '',
-    price: '',
-    year: '',
-    miles: '',
-    category: 'Car',
-    description: '',
-    owner: '1st Owner',
-  })
-
+  // Pickup Location
+  street_address: '',
+  city: '',
+  state: '',
+  postal_code: '',
+  country: '',
+})
   // ---------------------------------------------------
   // COMMON STYLES
   // ---------------------------------------------------
@@ -600,23 +611,28 @@ function SellerDashboard({ seller, onLogout }) {
     setError('')
     setImages(selectedFiles)
   }
+const resetVehicleForm = () => {
+  setForm({
+    title: '',
+    company: '',
+    model_name: '',
+    price: '',
+    year: '',
+    miles: '',
+    category: 'Car',
+    description: '',
+    owner: '1st Owner',
 
-  const resetVehicleForm = () => {
-    setForm({
-      title: '',
-      company: '',
-      model_name: '',
-      price: '',
-      year: '',
-      miles: '',
-      category: 'Car',
-      description: '',
-      owner: '1st Owner',
-    })
+    // Pickup Location
+    street_address: '',
+    city: '',
+    state: '',
+    postal_code: '',
+    country: '',
+  })
 
-    setImages([])
-  }
-
+  setImages([])
+}
   // ---------------------------------------------------
   // CREATE VEHICLE LISTING
   // ---------------------------------------------------
@@ -663,6 +679,12 @@ function SellerDashboard({ seller, onLogout }) {
       formData.append('category', form.category)
       formData.append('description', form.description.trim())
       formData.append('owner', form.owner)
+      // Pickup Location
+formData.append('street_address', form.street_address.trim())
+formData.append('city', form.city.trim())
+formData.append('state', form.state.trim())
+formData.append('postal_code', form.postal_code.trim())
+formData.append('country', form.country.trim())
 
       formData.append('image', images[0])
 
@@ -723,78 +745,93 @@ const openEditListing = (vehicle) => {
   // ---------------------------------------------------
   // UPDATE VEHICLE LISTING
   // ---------------------------------------------------
+// ---------------------------------------------------
+// UPDATE VEHICLE LISTING
+// ---------------------------------------------------
 
-  const handleUpdateListing = async (event) => {
-    event.preventDefault()
+const handleUpdateListing = async (event) => {
+  event.preventDefault()
 
-    if (!editingVehicle || editSubmitting) return
+  if (!editingVehicle || editSubmitting) return
 
-    setError('')
-    setSuccess('')
+  setError('')
+  setSuccess('')
 
-    const validationError = validateVehicleForm(editForm)
+  const validationError = validateVehicleForm(editForm)
 
-    if (validationError) {
-      setError(validationError)
-      return
-    }
-
-    setEditSubmitting(true)
-
-    try {
-      const kilometres = Math.round(Number(editForm.miles) * 1.60934)
-
-      const payload = {
-        title: editForm.title.trim(),
-        company: editForm.company,
-        model_name: editForm.model_name.trim(),
-        price: editForm.price,
-        year: Number(editForm.year),
-        km_driven: kilometres,
-        category: editForm.category,
-        description: editForm.description.trim(),
-        owner: editForm.owner,
-      }
-
-      const headers = await getCSRFHeaders()
-
-      const response = await api.patch(
-        `vehicles/${editingVehicle.id}/update/`,
-        payload,
-        {
-          headers,
-          withCredentials: true,
-        }
-      )
-
-      const wasRejected = editingVehicle.listing_status === 'REJECTED'
-
-      setEditingVehicle(null)
-
-      setSuccess(
-        response.data?.message ||
-        (
-          wasRejected
-            ? 'Listing updated successfully and submitted again for admin approval.'
-            : 'Vehicle listing updated successfully.'
-        )
-      )
-
-      await loadListings(true)
-    } catch (err) {
-      console.error('UPDATE LISTING ERROR:', err)
-      console.error('UPDATE LISTING RESPONSE:', err.response?.data)
-
-      setError(
-        getErrorMessage(
-          err,
-          'Unable to update vehicle listing. Please check whether the listing has bid history.'
-        )
-      )
-    } finally {
-      setEditSubmitting(false)
-    }
+  if (validationError) {
+    setError(validationError)
+    return
   }
+
+  setEditSubmitting(true)
+
+  try {
+    const kilometres = Math.round(
+      Number(editForm.miles) * 1.60934
+    )
+
+    const payload = {
+      title: editForm.title.trim(),
+      company: editForm.company,
+      model_name: editForm.model_name.trim(),
+      price: editForm.price,
+      year: Number(editForm.year),
+      km_driven: kilometres,
+      category: editForm.category,
+      description: editForm.description.trim(),
+      owner: editForm.owner,
+
+      // Pickup Location
+      street_address: editForm.street_address?.trim() || '',
+      city: editForm.city?.trim() || '',
+      state: editForm.state?.trim() || '',
+      postal_code: editForm.postal_code?.trim() || '',
+      country: editForm.country?.trim() || '',
+    }
+
+    const headers = await getCSRFHeaders()
+
+    const response = await api.patch(
+      `vehicles/${editingVehicle.id}/update/`,
+      payload,
+      {
+        headers,
+        withCredentials: true,
+      }
+    )
+
+    const wasRejected =
+      editingVehicle.listing_status === 'REJECTED'
+
+    setEditingVehicle(null)
+
+    setSuccess(
+      response.data?.message ||
+      (
+        wasRejected
+          ? 'Listing updated successfully and submitted again for admin approval.'
+          : 'Vehicle listing updated successfully.'
+      )
+    )
+
+    await loadListings(true)
+
+  } catch (err) {
+    console.error('UPDATE LISTING ERROR:', err)
+    console.error('UPDATE LISTING RESPONSE:', err.response?.data)
+
+    setError(
+      getErrorMessage(
+        err,
+        'Unable to update vehicle listing. Please check whether the listing has bid history.'
+      )
+    )
+
+  } finally {
+    setEditSubmitting(false)
+  }
+}
 
   // ---------------------------------------------------
   // OPEN IMAGE MANAGEMENT
@@ -1043,128 +1080,221 @@ const openEditListing = (vehicle) => {
   // ---------------------------------------------------
   // REUSABLE FORM FIELD
   // ---------------------------------------------------
+const renderVehicleFields = (data, onChange) => (
+  <div style={formGrid}>
+    <div>
+      <label style={labelStyle}>Vehicle Title *</label>
+      <input
+        name="title"
+        value={data.title}
+        onChange={onChange}
+        placeholder="2022 BMW X5 xDrive40i"
+        required
+        style={inputStyle}
+      />
+    </div>
 
-  const renderVehicleFields = (data, onChange) => (
-    <div style={formGrid}>
-      <div>
-        <label style={labelStyle}>Vehicle Title *</label>
-        <input
-          name="title"
-          value={data.title}
-          onChange={onChange}
-          placeholder="2022 BMW X5 xDrive40i"
-          required
-          style={inputStyle}
-        />
-      </div>
-
-      <div>
-        <label style={labelStyle}>Vehicle Brand *</label>
-        <select
-          name="company"
-          value={data.company}
-          onChange={onChange}
-          required
-          style={inputStyle}
-        >
-          <option value="">Select Brand</option>
-          {companies.map((company) => (
-            <option key={company.id} value={company.id}>
-              {company.name}
-            </option>
-          ))}
-        </select>
-      </div>
-
-      <div>
-        <label style={labelStyle}>Model *</label>
-        <input
-          name="model_name"
-          value={data.model_name}
-          onChange={onChange}
-          placeholder="X5 xDrive40i"
-          required
-          style={inputStyle}
-        />
-      </div>
-
-      <div>
-        <label style={labelStyle}>Price (USD) *</label>
-        <input
-          name="price"
-          type="number"
-          min="0.01"
-          step="0.01"
-          value={data.price}
-          onChange={onChange}
-          placeholder="45000"
-          required
-          style={inputStyle}
-        />
-      </div>
-
-      <div>
-        <label style={labelStyle}>Manufacturing Year *</label>
-        <input
-          name="year"
-          type="number"
-          min="1900"
-          max="2100"
-          value={data.year}
-          onChange={onChange}
-          placeholder="2022"
-          required
-          style={inputStyle}
-        />
-      </div>
-
-      <div>
-        <label style={labelStyle}>Mileage (Miles) *</label>
-        <input
-          name="miles"
-          type="number"
-          min="0"
-          value={data.miles}
-          onChange={onChange}
-          placeholder="25000"
-          required
-          style={inputStyle}
-        />
-      </div>
-
-      <div>
-        <label style={labelStyle}>Vehicle Category *</label>
-        <select
-          name="category"
-          value={data.category}
-          onChange={onChange}
-          style={inputStyle}
-        >
-          <option value="Car">Car</option>
-          <option value="Bike">Bike</option>
-          <option value="Truck">Truck</option>
-        </select>
-      </div>
-
-      <div>
-        <label style={labelStyle}>Ownership *</label>
-        <select
-          name="owner"
-          value={data.owner}
-          onChange={onChange}
-          style={inputStyle}
-        >
-          <option value="1st Owner">1st Owner</option>
-          <option value="2nd Owner">2nd Owner</option>
-          <option value="3rd Owner">3rd Owner</option>
-          <option value="Single Owner - USA Clean Title">
-            Single Owner - USA Clean Title
+    <div>
+      <label style={labelStyle}>Vehicle Brand *</label>
+      <select
+        name="company"
+        value={data.company}
+        onChange={onChange}
+        required
+        style={inputStyle}
+      >
+        <option value="">Select Brand</option>
+        {companies.map((company) => (
+          <option key={company.id} value={company.id}>
+            {company.name}
           </option>
-          <option value="2 Owners - US">2 Owners - US</option>
-        </select>
+        ))}
+      </select>
+    </div>
+
+    <div>
+      <label style={labelStyle}>Model *</label>
+      <input
+        name="model_name"
+        value={data.model_name}
+        onChange={onChange}
+        placeholder="X5 xDrive40i"
+        required
+        style={inputStyle}
+      />
+    </div>
+
+    <div>
+      <label style={labelStyle}>Price (USD) *</label>
+      <input
+        name="price"
+        type="number"
+        min="0.01"
+        step="0.01"
+        value={data.price}
+        onChange={onChange}
+        placeholder="45000"
+        required
+        style={inputStyle}
+      />
+    </div>
+
+    <div>
+      <label style={labelStyle}>Manufacturing Year *</label>
+      <input
+        name="year"
+        type="number"
+        min="1900"
+        max="2100"
+        value={data.year}
+        onChange={onChange}
+        placeholder="2022"
+        required
+        style={inputStyle}
+      />
+    </div>
+
+    <div>
+      <label style={labelStyle}>Mileage (Miles) *</label>
+      <input
+        name="miles"
+        type="number"
+        min="0"
+        value={data.miles}
+        onChange={onChange}
+        placeholder="25000"
+        required
+        style={inputStyle}
+      />
+    </div>
+
+    <div>
+      <label style={labelStyle}>Vehicle Category *</label>
+      <select
+        name="category"
+        value={data.category}
+        onChange={onChange}
+        style={inputStyle}
+      >
+        <option value="Car">Car</option>
+        <option value="Bike">Bike</option>
+        <option value="Truck">Truck</option>
+      </select>
+    </div>
+
+    <div>
+      <label style={labelStyle}>Ownership *</label>
+      <select
+        name="owner"
+        value={data.owner}
+        onChange={onChange}
+        style={inputStyle}
+      >
+        <option value="1st Owner">1st Owner</option>
+        <option value="2nd Owner">2nd Owner</option>
+        <option value="3rd Owner">3rd Owner</option>
+        <option value="Single Owner - USA Clean Title">
+          Single Owner - USA Clean Title
+        </option>
+        <option value="2 Owners - US">2 Owners - US</option>
+      </select>
+    </div>
+
+    {/* ================================= */}
+    {/* PICKUP LOCATION */}
+    {/* ================================= */}
+
+    <div
+      style={{
+        gridColumn: '1 / -1',
+        marginTop: '12px',
+        padding: '20px',
+        background: colors.background,
+        border: `1px solid ${colors.border || '#e5e7eb'}`,
+        borderRadius: '12px',
+      }}
+    >
+      <h3
+        style={{
+          margin: '0 0 6px',
+          fontSize: '18px',
+          fontWeight: '700',
+        }}
+      >
+        Pickup Location
+      </h3>
+
+      <p
+        style={{
+          margin: '0 0 18px',
+          color: colors.muted,
+          fontSize: '13px',
+        }}
+      >
+        Enter the location where buyers can collect this vehicle.
+      </p>
+
+      <div style={formGrid}>
+        <div style={{ gridColumn: '1 / -1' }}>
+          <label style={labelStyle}>Street Address</label>
+          <input
+            name="street_address"
+            value={data.street_address || ''}
+            onChange={onChange}
+            placeholder="123 Main Street"
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label style={labelStyle}>City</label>
+          <input
+            name="city"
+            value={data.city || ''}
+            onChange={onChange}
+            placeholder="Los Angeles"
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label style={labelStyle}>State</label>
+          <input
+            name="state"
+            value={data.state || ''}
+            onChange={onChange}
+            placeholder="California"
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label style={labelStyle}>Postal Code</label>
+          <input
+            name="postal_code"
+            value={data.postal_code || ''}
+            onChange={onChange}
+            placeholder="90001"
+            style={inputStyle}
+          />
+        </div>
+
+        <div>
+          <label style={labelStyle}>Country</label>
+          <input
+            name="country"
+            value={data.country || ''}
+            onChange={onChange}
+            placeholder="United States"
+            style={inputStyle}
+          />
+        </div>
       </div>
     </div>
-  )
+  </div>
+)
+
+
 
   // ---------------------------------------------------
   // DASHBOARD UI
@@ -2271,18 +2401,28 @@ function SellerEditPage() {
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+const [form, setForm] = useState({
+  title: '',
+  company: '',
+  model_name: '',
+  price: '',
+  year: '',
+  miles: '',
+  category: 'Car',
+  description: '',
+  owner: '1st Owner',
 
-  const [form, setForm] = useState({
-    title: '',
-    company: '',
-    model_name: '',
-    price: '',
-    year: '',
-    miles: '',
-    category: 'Car',
-    description: '',
-    owner: '1st Owner',
-  })
+  // Pickup Location
+  street_address: '',
+  city: '',
+  state: '',
+  postal_code: '',
+  country: '',
+})
+
+  // ---------------------------------------------------
+  // COMMON STYLES
+  // ---------------------------------------------------
 
   const colors = {
     navy: '#101827',
@@ -2331,7 +2471,6 @@ function SellerEditPage() {
     fontWeight: '700',
     cursor: 'pointer',
   }
-
   // ---------------------------------------------------
   // LOAD VEHICLE AND COMPANIES
   // ---------------------------------------------------
@@ -2395,20 +2534,26 @@ function SellerEditPage() {
             ? String(matchingCompany.id)
             : ''
         }
+setForm({
+  title: selectedVehicle.title || '',
+  company: companyId,
+  model_name: selectedVehicle.model_name || '',
+  price: selectedVehicle.price || '',
+  year: selectedVehicle.year || '',
+  miles: Math.round(
+    Number(selectedVehicle.km_driven || 0) * 0.621371
+  ),
+  category: selectedVehicle.category || 'Car',
+  description: selectedVehicle.description || '',
+  owner: selectedVehicle.owner || '1st Owner',
 
-        setForm({
-          title: selectedVehicle.title || '',
-          company: companyId,
-          model_name: selectedVehicle.model_name || '',
-          price: selectedVehicle.price || '',
-          year: selectedVehicle.year || '',
-          miles: Math.round(
-            Number(selectedVehicle.km_driven || 0) * 0.621371
-          ),
-          category: selectedVehicle.category || 'Car',
-          description: selectedVehicle.description || '',
-          owner: selectedVehicle.owner || '1st Owner',
-        })
+  // Pickup Location
+  street_address: selectedVehicle.street_address || '',
+  city: selectedVehicle.city || '',
+  state: selectedVehicle.state || '',
+  postal_code: selectedVehicle.postal_code || '',
+  country: selectedVehicle.country || '',
+})
       } catch (err) {
         console.error('EDIT PAGE LOAD ERROR:', err)
 
@@ -2503,17 +2648,23 @@ function SellerEditPage() {
 
     try {
       const payload = {
-        title: form.title.trim(),
-        company: form.company,
-        model_name: form.model_name.trim(),
-        price: form.price,
-        year: Number(form.year),
-        km_driven: Math.round(Number(form.miles) * 1.60934),
-        category: form.category,
-        description: form.description.trim(),
-        owner: form.owner,
-      }
+  title: form.title.trim(),
+  company: form.company,
+  model_name: form.model_name.trim(),
+  price: form.price,
+  year: Number(form.year),
+  km_driven: Math.round(Number(form.miles) * 1.60934),
+  category: form.category,
+  description: form.description.trim(),
+  owner: form.owner,
 
+  // Pickup Location
+  street_address: form.street_address.trim(),
+  city: form.city.trim(),
+  state: form.state.trim(),
+  postal_code: form.postal_code.trim(),
+  country: form.country.trim(),
+}
       const headers = await getCSRFHeaders()
 
       const response = await api.patch(
@@ -2876,6 +3027,123 @@ function SellerEditPage() {
                 }}
                 placeholder="Describe vehicle condition, features and service history..."
               />
+            </div>
+
+                        {/* =========================================
+                PICKUP LOCATION
+            ========================================= */}
+
+            <div
+              style={{
+                marginTop: '25px',
+                padding: '22px',
+                border: `1px solid ${colors.border}`,
+                borderRadius: '12px',
+                background: '#fafbfc',
+              }}
+            >
+              <h3
+                style={{
+                  margin: '0 0 8px',
+                  fontSize: '18px',
+                  color: colors.text,
+                }}
+              >
+                Pickup Location
+              </h3>
+
+              <p
+                style={{
+                  color: colors.muted,
+                  fontSize: '13px',
+                  marginBottom: '20px',
+                }}
+              >
+                Update the location where buyers can collect this vehicle.
+              </p>
+
+              <div
+                style={{
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
+                  gap: '18px',
+                }}
+              >
+                {/* Street Address */}
+                <div style={{ gridColumn: '1 / -1' }}>
+                  <label style={labelStyle}>
+                    Street Address
+                  </label>
+
+                  <input
+                    name="street_address"
+                    value={form.street_address}
+                    onChange={handleChange}
+                    style={inputStyle}
+                    placeholder="Enter street address"
+                  />
+                </div>
+
+                {/* City */}
+                <div>
+                  <label style={labelStyle}>
+                    City
+                  </label>
+
+                  <input
+                    name="city"
+                    value={form.city}
+                    onChange={handleChange}
+                    style={inputStyle}
+                    placeholder="Enter city"
+                  />
+                </div>
+
+                {/* State */}
+                <div>
+                  <label style={labelStyle}>
+                    State
+                  </label>
+
+                  <input
+                    name="state"
+                    value={form.state}
+                    onChange={handleChange}
+                    style={inputStyle}
+                    placeholder="Enter state"
+                  />
+                </div>
+
+                {/* Postal Code */}
+                <div>
+                  <label style={labelStyle}>
+                    ZIP / Postal Code
+                  </label>
+
+                  <input
+                    name="postal_code"
+                    value={form.postal_code}
+                    onChange={handleChange}
+                    style={inputStyle}
+                    placeholder="Enter ZIP / Postal Code"
+                  />
+                </div>
+
+                {/* Country */}
+                <div>
+                  <label style={labelStyle}>
+                    Country
+                  </label>
+
+                  <input
+                    name="country"
+                    value={form.country}
+                    onChange={handleChange}
+                    style={inputStyle}
+                    placeholder="Enter country"
+                  />
+                </div>
+              </div>
             </div>
 
             <div
@@ -5475,8 +5743,6 @@ const textButtonStyle = {
   cursor: 'pointer',
 }
 
-
-
 // =====================================================
 // MAIN APP ROUTES
 // =====================================================
@@ -5494,17 +5760,24 @@ function App() {
           element={<VehicleDetails />}
         />
 
+        {/* ADMIN LOGIN */}
+        <Route
+          path="/admin/login"
+          element={<AdminLoginPanel />}
+        />
+
         {/* ADMIN BIDS DASHBOARD */}
         <Route
           path="/admin/bids"
           element={<AdminBidsDashboard />}
         />
 
-      {/* BUYER MY BIDS PAGE */}
-       <Route
-       path="/my-bids"
-       element={<BuyerMyBids />}
+        {/* BUYER MY BIDS PAGE */}
+        <Route
+          path="/my-bids"
+          element={<BuyerMyBids />}
         />
+
         {/* SELLER PORTAL */}
         <Route
           path="/seller"

@@ -8,6 +8,7 @@ from .api_views import (
     # AUTHENTICATION APIs
     # =====================================
     csrf_cookie_api,
+    admin_login_api,
     seller_register_api,
     seller_login_api,
     seller_logout_api,
@@ -134,6 +135,17 @@ urlpatterns = [
         'api/auth/csrf/',
         csrf_cookie_api,
         name='api-auth-csrf'
+    ),
+
+
+    # =====================================
+    # ADMIN AUTHENTICATION API
+    # =====================================
+
+    path(
+        'api/admin/login/',
+        admin_login_api,
+        name='api-admin-login'
     ),
 
 

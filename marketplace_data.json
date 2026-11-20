@@ -1,0 +1,599 @@
+[
+{
+  "model": "marketplace.company",
+  "pk": 6,
+  "fields": {
+    "name": "Tesla"
+  }
+},
+{
+  "model": "marketplace.company",
+  "pk": 7,
+  "fields": {
+    "name": "Ford"
+  }
+},
+{
+  "model": "marketplace.company",
+  "pk": 8,
+  "fields": {
+    "name": "Jaguar"
+  }
+},
+{
+  "model": "marketplace.company",
+  "pk": 9,
+  "fields": {
+    "name": "Land Rover"
+  }
+},
+{
+  "model": "marketplace.company",
+  "pk": 10,
+  "fields": {
+    "name": "Aston Martin"
+  }
+},
+{
+  "model": "marketplace.company",
+  "pk": 11,
+  "fields": {
+    "name": "BMW"
+  }
+},
+{
+  "model": "marketplace.company",
+  "pk": 12,
+  "fields": {
+    "name": "Rolls-Royce"
+  }
+},
+{
+  "model": "marketplace.vehicle",
+  "pk": 1,
+  "fields": {
+    "title": "Tesla Model 3 Long Range AWD",
+    "company": 6,
+    "model_name": "Model 3 Long Range",
+    "price": "32990.00",
+    "year": 2022,
+    "km_driven": 15500,
+    "category": "Car",
+    "description": "Clean Title - California Single Owner - 15,500 Miles - Full Self Driving Package - 358 Mile Range - Autopilot - Supercharging Included",
+    "image": "vehicles/1.webp",
+    "owner": "owner_id",
+    "seller": null,
+    "listing_status": "APPROVED",
+    "rejection_reason": "",
+    "is_verified": true,
+    "is_sold": false,
+    "created_at": "2026-11-15T05:49:44.192Z",
+    "updated_at": "2026-11-15T05:49:44.310Z"
+  }
+},
+{
+  "model": "marketplace.vehicle",
+  "pk": 2,
+  "fields": {
+    "title": "Ford Mustang GT Premium V8 5.0L",
+    "company": 7,
+    "model_name": "Mustang GT",
+    "price": "41200.00",
+    "year": 2021,
+    "km_driven": 22000,
+    "category": "Car",
+    "description": "Clean Title - Texas Edition - 22,000 Miles - 480HP V8 - GT Performance Pack - Active Exhaust - No Accidents - Full Service History",
+    "image": "vehicles/2.webp",
+    "owner": "owner_id",
+    "seller": null,
+    "listing_status": "APPROVED",
+    "rejection_reason": "",
+    "is_verified": true,
+    "is_sold": false,
+    "created_at": "2026-11-15T05:49:44.192Z",
+    "updated_at": "2026-11-15T05:49:44.310Z"
+  }
+},
+{
+  "model": "marketplace.vehicle",
+  "pk": 3,
+  "fields": {
+    "title": "Jaguar F-Pace R-Dynamic HSE D200",
+    "company": 8,
+    "model_name": "F-Pace",
+    "price": "48900.00",
+    "year": 2023,
+    "km_driven": 8000,
+    "category": "Car",
+    "description": "UK Spec Clean Title - London - 8,000 Miles Only - One Owner - Panoramic Roof - Meridian 3D Sound - 360 Camera - Full Service History",
+    "image": "vehicles/3.webp",
+    "owner": "owner_id",
+    "seller": null,
+    "listing_status": "APPROVED",
+    "rejection_reason": "",
+    "is_verified": true,
+    "is_sold": false,
+    "created_at": "2026-11-15T05:49:44.192Z",
+    "updated_at": "2026-11-15T05:49:44.310Z"
+  }
+},
+{
+  "model": "marketplace.vehicle",
+  "pk": 4,
+  "fields": {
+    "title": "Land Rover Defender 110 SE P300",
+    "company": 9,
+    "model_name": "Defender 110",
+    "price": "67500.00",
+    "year": 2023,
+    "km_driven": 5500,
+    "category": "Car",
+    "description": "UK Import Clean Title - 5,000 Miles Only - Adventure Pack - Air Suspension - Like New Condition - Off-Road Ready",
+    "image": "vehicles/4.webp",
+    "owner": "owner_id",
+    "seller": null,
+    "listing_status": "APPROVED",
+    "rejection_reason": "",
+    "is_verified": true,
+    "is_sold": false,
+    "created_at": "2026-11-15T05:49:44.192Z",
+    "updated_at": "2026-11-15T05:49:44.310Z"
+  }
+},
+{
+  "model": "marketplace.vehicle",
+  "pk": 5,
+  "fields": {
+    "title": "Aston Martin DBX 707",
+    "company": 10,
+    "model_name": "DBX 707",
+    "price": "189900.00",
+    "year": 2024,
+    "km_driven": 2000,
+    "category": "Car",
+    "description": "Flagship Luxury SUV - 697HP - 2,000 Miles - Brand New Condition - Full Factory Warranty - Carbon Pack - 0-60 in 3.1s - UK Spec",
+    "image": "vehicles/5.webp",
+    "owner": "1st Owner",
+    "seller": null,
+    "listing_status": "APPROVED",
+    "rejection_reason": "",
+    "is_verified": true,
+    "is_sold": false,
+    "created_at": "2026-11-15T05:49:44.192Z",
+    "updated_at": "2026-11-15T06:21:40.386Z"
+  }
+},
+{
+  "model": "marketplace.vehicle",
+  "pk": 6,
+  "fields": {
+    "title": "AutoZ Auction Test Vehicle",
+    "company": 7,
+    "model_name": "Mustang GT Test",
+    "price": "25000.00",
+    "year": 2024,
+    "km_driven": 5000,
+    "category": "Car",
+    "description": "Test vehicle for automatic auction renewal verification",
+    "image": "vehicles/6.webp",
+    "owner": "1st Owner",
+    "seller": 6,
+    "listing_status": "APPROVED",
+    "rejection_reason": "",
+    "is_verified": true,
+    "is_sold": false,
+    "created_at": "2026-11-17T12:40:18.227Z",
+    "updated_at": "2026-11-17T12:42:51.154Z"
+  }
+},
+{
+  "model": "marketplace.vehicle",
+  "pk": 7,
+  "fields": {
+    "title": "2022 BMW X5 xDrive40i",
+    "company": 11,
+    "model_name": "X5 xDrive40i",
+    "price": "46000.00",
+    "year": 2022,
+    "km_driven": 35405,
+    "category": "Car",
+    "description": "2022 BMW X5 xDrive40i in excellent condition. This luxury SUV features a powerful engine, premium leather interior, panoramic sunroof, advanced navigation system, parking sensors, and modern safety features.\r\n\r\nThe vehicle has 25,000 miles and has been well maintained. It comes with a clean US title and complete service history.\r\n\r\nIdeal for buyers looking for a premium luxury SUV with comfort, performance, and reliability.",
+    "image": "vehicles/7.webp",
+    "owner": "1st Owner",
+    "seller": 5,
+    "listing_status": "APPROVED",
+    "rejection_reason": "",
+    "is_verified": true,
+    "is_sold": false,
+    "created_at": "2026-11-18T05:32:21.047Z",
+    "updated_at": "2026-11-18T11:06:24.380Z"
+  }
+},
+{
+  "model": "marketplace.auction",
+  "pk": 8,
+  "fields": {
+    "vehicle": 5,
+    "base_price": "189900.00",
+    "current_price": "226900.00",
+    "end_time": "2026-11-20T18:00:00Z",
+    "is_active": true
+  }
+},
+{
+  "model": "marketplace.auction",
+  "pk": 9,
+  "fields": {
+    "vehicle": 4,
+    "base_price": "67500.00",
+    "current_price": "67508.00",
+    "end_time": "2026-09-30T16:43:09.612Z",
+    "is_active": false
+  }
+},
+{
+  "model": "marketplace.auction",
+  "pk": 10,
+  "fields": {
+    "vehicle": 3,
+    "base_price": "48900.00",
+    "current_price": "48904.00",
+    "end_time": "2026-10-01T13:09:03.990Z",
+    "is_active": false
+  }
+},
+{
+  "model": "marketplace.auction",
+  "pk": 11,
+  "fields": {
+    "vehicle": 2,
+    "base_price": "41200.00",
+    "current_price": "41200.00",
+    "end_time": "2026-10-03T13:22:43.956Z",
+    "is_active": false
+  }
+},
+{
+  "model": "marketplace.auction",
+  "pk": 12,
+  "fields": {
+    "vehicle": 1,
+    "base_price": "32990.00",
+    "current_price": "38990.00",
+    "end_time": "2026-11-24T08:25:42.179Z",
+    "is_active": true
+  }
+},
+{
+  "model": "marketplace.auction",
+  "pk": 13,
+  "fields": {
+    "vehicle": 2,
+    "base_price": "41200.00",
+    "current_price": "53200.00",
+    "end_time": "2026-11-24T08:37:07.942Z",
+    "is_active": true
+  }
+},
+{
+  "model": "marketplace.auction",
+  "pk": 14,
+  "fields": {
+    "vehicle": 3,
+    "base_price": "48900.00",
+    "current_price": "66900.00",
+    "end_time": "2026-11-24T08:37:07.951Z",
+    "is_active": true
+  }
+},
+{
+  "model": "marketplace.auction",
+  "pk": 15,
+  "fields": {
+    "vehicle": 4,
+    "base_price": "67500.00",
+    "current_price": "85500.00",
+    "end_time": "2026-11-24T08:37:07.953Z",
+    "is_active": true
+  }
+},
+{
+  "model": "marketplace.auction",
+  "pk": 16,
+  "fields": {
+    "vehicle": 6,
+    "base_price": "25000.00",
+    "current_price": "25000.00",
+    "end_time": "2026-11-17T12:40:56.990Z",
+    "is_active": false
+  }
+},
+{
+  "model": "marketplace.auction",
+  "pk": 17,
+  "fields": {
+    "vehicle": 6,
+    "base_price": "25000.00",
+    "current_price": "25000.00",
+    "end_time": "2026-11-17T12:41:39.842Z",
+    "is_active": false
+  }
+},
+{
+  "model": "marketplace.auction",
+  "pk": 18,
+  "fields": {
+    "vehicle": 6,
+    "base_price": "25000.00",
+    "current_price": "49000.00",
+    "end_time": "2026-11-24T12:47:05.991Z",
+    "is_active": true
+  }
+},
+{
+  "model": "marketplace.auction",
+  "pk": 19,
+  "fields": {
+    "vehicle": 7,
+    "base_price": "45000.00",
+    "current_price": "45000.00",
+    "end_time": "2026-11-25T05:36:29.065Z",
+    "is_active": true
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 23,
+  "fields": {
+    "auction": 10,
+    "user": null,
+    "bidder_name": "CS",
+    "bid_amount": "48904.00",
+    "bid_time": "2026-09-27T03:37:01.227Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 24,
+  "fields": {
+    "auction": 8,
+    "user": null,
+    "bidder_name": "sangita",
+    "bid_amount": "195900.00",
+    "bid_time": "2026-11-17T05:39:00.035Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 25,
+  "fields": {
+    "auction": 8,
+    "user": null,
+    "bidder_name": "sangita",
+    "bid_amount": "206900.00",
+    "bid_time": "2026-11-17T05:39:56.447Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 26,
+  "fields": {
+    "auction": 8,
+    "user": null,
+    "bidder_name": "cs",
+    "bid_amount": "212900.00",
+    "bid_time": "2026-11-17T05:41:17.088Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 27,
+  "fields": {
+    "auction": 8,
+    "user": 1,
+    "bidder_name": "solapur_buyer",
+    "bid_amount": "213900.00",
+    "bid_time": "2026-11-17T07:23:16.085Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 28,
+  "fields": {
+    "auction": 8,
+    "user": 2,
+    "bidder_name": "us",
+    "bid_amount": "214900.00",
+    "bid_time": "2026-11-17T07:27:17.742Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 29,
+  "fields": {
+    "auction": 12,
+    "user": 1,
+    "bidder_name": "solapur_buyer",
+    "bid_amount": "38990.00",
+    "bid_time": "2026-11-17T08:30:17.684Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 30,
+  "fields": {
+    "auction": 18,
+    "user": 1,
+    "bidder_name": "solapur_buyer",
+    "bid_amount": "31000.00",
+    "bid_time": "2026-11-17T12:53:30.852Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 31,
+  "fields": {
+    "auction": 15,
+    "user": 1,
+    "bidder_name": "solapur_buyer",
+    "bid_amount": "73500.00",
+    "bid_time": "2026-11-17T12:54:07.713Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 32,
+  "fields": {
+    "auction": 18,
+    "user": 7,
+    "bidder_name": "sangita malabadi",
+    "bid_amount": "37000.00",
+    "bid_time": "2026-11-17T13:07:11.423Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 33,
+  "fields": {
+    "auction": 18,
+    "user": 1,
+    "bidder_name": "solapur_buyer",
+    "bid_amount": "43000.00",
+    "bid_time": "2026-11-17T13:08:26.088Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 34,
+  "fields": {
+    "auction": 18,
+    "user": 7,
+    "bidder_name": "sangita malabadi",
+    "bid_amount": "49000.00",
+    "bid_time": "2026-11-17T13:09:46.996Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 35,
+  "fields": {
+    "auction": 8,
+    "user": 7,
+    "bidder_name": "sangita malabadi",
+    "bid_amount": "220900.00",
+    "bid_time": "2026-11-17T13:23:05.455Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 36,
+  "fields": {
+    "auction": 14,
+    "user": 1,
+    "bidder_name": "solapur_buyer",
+    "bid_amount": "54900.00",
+    "bid_time": "2026-11-17T13:40:54.232Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 37,
+  "fields": {
+    "auction": 14,
+    "user": 7,
+    "bidder_name": "sangita malabadi",
+    "bid_amount": "60900.00",
+    "bid_time": "2026-11-18T10:13:01.691Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 38,
+  "fields": {
+    "auction": 13,
+    "user": 7,
+    "bidder_name": "sangita malabadi",
+    "bid_amount": "47200.00",
+    "bid_time": "2026-11-18T10:16:34.359Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 39,
+  "fields": {
+    "auction": 15,
+    "user": 7,
+    "bidder_name": "sangita malabadi",
+    "bid_amount": "79500.00",
+    "bid_time": "2026-11-18T10:21:01.238Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 40,
+  "fields": {
+    "auction": 15,
+    "user": 7,
+    "bidder_name": "sangita malabadi",
+    "bid_amount": "85500.00",
+    "bid_time": "2026-11-18T10:32:20.946Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 41,
+  "fields": {
+    "auction": 8,
+    "user": 7,
+    "bidder_name": "sangita malabadi",
+    "bid_amount": "226900.00",
+    "bid_time": "2026-11-18T10:41:36.363Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 42,
+  "fields": {
+    "auction": 14,
+    "user": 7,
+    "bidder_name": "sangita malabadi",
+    "bid_amount": "66900.00",
+    "bid_time": "2026-11-18T10:51:43.037Z"
+  }
+},
+{
+  "model": "marketplace.bid",
+  "pk": 43,
+  "fields": {
+    "auction": 13,
+    "user": 7,
+    "bidder_name": "sangita malabadi",
+    "bid_amount": "53200.00",
+    "bid_time": "2026-11-18T11:05:02.901Z"
+  }
+},
+{
+  "model": "marketplace.ticket",
+  "pk": 1,
+  "fields": {
+    "user": 3,
+    "vehicle": 1,
+    "issue_type": "OTHER",
+    "message": "other",
+    "status": "OPEN",
+    "created_at": "2026-09-27T02:38:39.057Z"
+  }
+},
+{
+  "model": "marketplace.ticket",
+  "pk": 2,
+  "fields": {
+    "user": null,
+    "vehicle": 5,
+    "issue_type": "PAYMENT",
+    "message": "payment issue",
+    "status": "OPEN",
+    "created_at": "2026-11-17T05:32:01.487Z"
+  }
+}
+]

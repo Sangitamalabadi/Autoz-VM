@@ -2,14 +2,15 @@
 """
 Django settings for AutoZ project.
 
-Development: SQLite
-Production: PostgreSQL (Render)
+Development: SQLite + Local Media Storage (fallback)
+Production: PostgreSQL + Cloudinary (Render)
 """
 
 import os
 from pathlib import Path
 
 import dj_database_url
+from dotenv import load_dotenv
 
 
 # --------------------------------------------------
@@ -23,18 +24,24 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ENVIRONMENT CONFIGURATION
 # --------------------------------------------------
 
-DEBUG = os.environ.get('DEBUG', 'True').lower() in (
-    'true', '1', 'yes'
+# Load environment variables from project root .env
+# Existing system environment variables take precedence.
+load_dotenv(BASE_DIR / ".env")
+
+DEBUG = os.environ.get("DEBUG", "True").lower() in (
+    "true",
+    "1",
+    "yes",
 )
 
 SECRET_KEY = os.environ.get(
-    'DJANGO_SECRET_KEY',
-    'django-insecure-local-development-only'
+    "DJANGO_SECRET_KEY",
+    "django-insecure-local-development-only",
 )
 
-if not DEBUG and SECRET_KEY == 'django-insecure-local-development-only':
+if not DEBUG and SECRET_KEY == "django-insecure-local-development-only":
     raise ValueError(
-        'DJANGO_SECRET_KEY must be configured in production.'
+        "DJANGO_SECRET_KEY must be configured in production."
     )
 
 
@@ -45,13 +52,16 @@ if not DEBUG and SECRET_KEY == 'django-insecure-local-development-only':
 ALLOWED_HOSTS = [
     host.strip()
     for host in os.environ.get(
-        'ALLOWED_HOSTS',
-        'localhost,127.0.0.1'
-    ).split(',')
+        "ALLOWED_HOSTS",
+        "localhost,127.0.0.1",
+    ).split(",")
     if host.strip()
 ]
 
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_PROXY_SSL_HEADER = (
+    "HTTP_X_FORWARDED_PROTO",
+    "https",
+)
 
 SECURE_SSL_REDIRECT = not DEBUG
 
@@ -61,15 +71,14 @@ CSRF_COOKIE_SECURE = not DEBUG
 SESSION_COOKIE_HTTPONLY = True
 CSRF_COOKIE_HTTPONLY = False
 
-# Cross-origin frontend/backend cookie configuration
-SESSION_COOKIE_SAMESITE = 'None' if not DEBUG else 'Lax'
-CSRF_COOKIE_SAMESITE = 'None' if not DEBUG else 'Lax'
+SESSION_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
+CSRF_COOKIE_SAMESITE = "None" if not DEBUG else "Lax"
 
-SESSION_COOKIE_NAME = 'sessionid'
-CSRF_COOKIE_NAME = 'csrftoken'
+SESSION_COOKIE_NAME = "sessionid"
+CSRF_COOKIE_NAME = "csrftoken"
 
-SESSION_COOKIE_PATH = '/'
-CSRF_COOKIE_PATH = '/'
+SESSION_COOKIE_PATH = "/"
+CSRF_COOKIE_PATH = "/"
 
 
 # --------------------------------------------------
@@ -77,24 +86,24 @@ CSRF_COOKIE_PATH = '/'
 # --------------------------------------------------
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
     # Project Apps
-    'marketplace.apps.MarketplaceConfig',
+    "marketplace.apps.MarketplaceConfig",
 
     # Third Party Apps
-    'rest_framework',
-    'drf_spectacular',
-    'corsheaders',
+    "rest_framework",
+    "drf_spectacular",
+    "corsheaders",
 
     # Cloudinary
-    'cloudinary_storage',
-    'cloudinary',
+    "cloudinary_storage",
+    "cloudinary",
 ]
 
 
@@ -102,11 +111,38 @@ INSTALLED_APPS = [
 # CLOUDINARY CONFIGURATION
 # --------------------------------------------------
 
+CLOUDINARY_CLOUD_NAME = os.environ.get(
+    "CLOUDINARY_CLOUD_NAME",
+    "",
+).strip()
+
+CLOUDINARY_API_KEY = os.environ.get(
+    "CLOUDINARY_API_KEY",
+    "",
+).strip()
+
+CLOUDINARY_API_SECRET = os.environ.get(
+    "CLOUDINARY_API_SECRET",
+    "",
+).strip()
+
+CLOUDINARY_CONFIGURED = all([
+    CLOUDINARY_CLOUD_NAME,
+    CLOUDINARY_API_KEY,
+    CLOUDINARY_API_SECRET,
+])
+
 CLOUDINARY_STORAGE = {
-    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
-    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
-    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+    "CLOUD_NAME": CLOUDINARY_CLOUD_NAME,
+    "API_KEY": CLOUDINARY_API_KEY,
+    "API_SECRET": CLOUDINARY_API_SECRET,
 }
+
+# Production must have valid Cloudinary configuration.
+if not DEBUG and not CLOUDINARY_CONFIGURED:
+    raise ValueError(
+        "Cloudinary credentials must be configured in production."
+    )
 
 
 # --------------------------------------------------
@@ -114,14 +150,16 @@ CLOUDINARY_STORAGE = {
 # --------------------------------------------------
 
 REST_FRAMEWORK = {
-    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    "DEFAULT_SCHEMA_CLASS": (
+        "drf_spectacular.openapi.AutoSchema"
+    ),
 
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.SessionAuthentication',
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
     ],
 
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticatedOrReadOnly',
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticatedOrReadOnly",
     ],
 }
 
@@ -131,13 +169,13 @@ REST_FRAMEWORK = {
 # --------------------------------------------------
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'AutoZ Auction API',
-    'DESCRIPTION': (
-        'Company Level Vehicle Auction Platform - '
-        'Vehicle, Auction, Ticket & Bidding System'
+    "TITLE": "AutoZ Auction API",
+    "DESCRIPTION": (
+        "Company Level Vehicle Auction Platform - "
+        "Vehicle, Auction, Ticket & Bidding System"
     ),
-    'VERSION': '1.0.0',
-    'SERVE_INCLUDE_SCHEMA': False,
+    "VERSION": "1.0.0",
+    "SERVE_INCLUDE_SCHEMA": False,
 }
 
 
@@ -146,18 +184,18 @@ SPECTACULAR_SETTINGS = {
 # --------------------------------------------------
 
 MIDDLEWARE = [
-    'django.middleware.security.SecurityMiddleware',
+    "django.middleware.security.SecurityMiddleware",
 
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 
-    'corsheaders.middleware.CorsMiddleware',
+    "corsheaders.middleware.CorsMiddleware",
 
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
 
 
@@ -165,26 +203,25 @@ MIDDLEWARE = [
 # URL CONFIGURATION
 # --------------------------------------------------
 
-ROOT_URLCONF = 'core.urls'
+ROOT_URLCONF = "core.urls"
 
 
 # --------------------------------------------------
 # TEMPLATES
 # --------------------------------------------------
-
 TEMPLATES = [
     {
-        'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [
-            BASE_DIR / 'marketplace' / 'templates',
+        "BACKEND": "django.template.backends.django.DjangoTemplates",
+        "DIRS": [
+            BASE_DIR / "marketplace" / "templates",
         ],
-        'APP_DIRS': True,
-        'OPTIONS': {
-            'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.request',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+        "APP_DIRS": True,
+        "OPTIONS": {
+            "context_processors": [
+                "django.template.context_processors.debug",
+                "django.template.context_processors.request",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
             ],
         },
     },
@@ -195,27 +232,29 @@ TEMPLATES = [
 # WSGI APPLICATION
 # --------------------------------------------------
 
-WSGI_APPLICATION = 'core.wsgi.application'
+WSGI_APPLICATION = "core.wsgi.application"
 
 
 # --------------------------------------------------
 # DATABASE CONFIGURATION
 # --------------------------------------------------
 
-if os.environ.get('DATABASE_URL'):
+DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+
+if DATABASE_URL:
     DATABASES = {
-        'default': dj_database_url.parse(
-            os.environ['DATABASE_URL'],
+        "default": dj_database_url.parse(
+            DATABASE_URL,
             conn_max_age=600,
             conn_health_checks=True,
-            ssl_require=True,
+            ssl_require=not DEBUG,
         )
     }
 else:
     DATABASES = {
-        'default': {
-            'ENGINE': 'django.db.backends.sqlite3',
-            'NAME': BASE_DIR / 'db.sqlite3',
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": BASE_DIR / "db.sqlite3",
         }
     }
 
@@ -226,27 +265,27 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        'NAME': (
-            'django.contrib.auth.password_validation.'
-            'UserAttributeSimilarityValidator'
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "UserAttributeSimilarityValidator"
         ),
     },
     {
-        'NAME': (
-            'django.contrib.auth.password_validation.'
-            'MinimumLengthValidator'
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "MinimumLengthValidator"
         ),
     },
     {
-        'NAME': (
-            'django.contrib.auth.password_validation.'
-            'CommonPasswordValidator'
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "CommonPasswordValidator"
         ),
     },
     {
-        'NAME': (
-            'django.contrib.auth.password_validation.'
-            'NumericPasswordValidator'
+        "NAME": (
+            "django.contrib.auth.password_validation."
+            "NumericPasswordValidator"
         ),
     },
 ]
@@ -256,9 +295,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # INTERNATIONALIZATION
 # --------------------------------------------------
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = "UTC"
 
 USE_I18N = True
 
@@ -269,19 +308,45 @@ USE_TZ = True
 # STATIC FILES
 # --------------------------------------------------
 
-STATIC_URL = '/static/'
+STATIC_URL = "/static/"
 
-STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
+# --------------------------------------------------
+# MEDIA FILES
+# --------------------------------------------------
+
+MEDIA_URL = "/media/"
+
+MEDIA_ROOT = BASE_DIR / "media"
+
+
+# --------------------------------------------------
+# MEDIA STORAGE CONFIGURATION
+# --------------------------------------------------
+
+# Cloudinary is used when credentials are configured.
+# Local filesystem storage is used when credentials
+# are missing during local development.
+
+if CLOUDINARY_CONFIGURED:
+    MEDIA_STORAGE_BACKEND = (
+        "cloudinary_storage.storage.MediaCloudinaryStorage"
+    )
+else:
+    MEDIA_STORAGE_BACKEND = (
+        "django.core.files.storage.FileSystemStorage"
+    )
+
 
 STORAGES = {
-    'default': {
-        'BACKEND': (
-            'cloudinary_storage.storage.MediaCloudinaryStorage'
-        ),
+    "default": {
+        "BACKEND": MEDIA_STORAGE_BACKEND,
     },
-    'staticfiles': {
-        'BACKEND': (
-            'whitenoise.storage.CompressedManifestStaticFilesStorage'
+    "staticfiles": {
+        "BACKEND": (
+            "whitenoise.storage.CompressedManifestStaticFilesStorage"
         ),
     },
 }
@@ -291,16 +356,9 @@ STORAGES = {
 # EMAIL CONFIGURATION
 # --------------------------------------------------
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
-
-
-# --------------------------------------------------
-# MEDIA FILES
-# --------------------------------------------------
-
-MEDIA_URL = '/media/'
-
-MEDIA_ROOT = BASE_DIR / 'media'
+EMAIL_BACKEND = (
+    "django.core.mail.backends.console.EmailBackend"
+)
 
 
 # --------------------------------------------------
@@ -308,9 +366,9 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # --------------------------------------------------
 
 FRONTEND_URL = os.environ.get(
-    'FRONTEND_URL',
-    'http://localhost:5173'
-).rstrip('/')
+    "FRONTEND_URL",
+    "http://localhost:5173",
+).rstrip("/")
 
 CORS_ALLOWED_ORIGINS = [
     FRONTEND_URL,
@@ -329,11 +387,11 @@ CSRF_TRUSTED_ORIGINS = [
 
 if DEBUG:
     CORS_ALLOWED_ORIGINS.extend([
-        'http://127.0.0.1:5173',
+        "http://127.0.0.1:5173",
     ])
 
     CSRF_TRUSTED_ORIGINS.extend([
-        'http://127.0.0.1:5173',
+        "http://127.0.0.1:5173",
     ])
 
 
@@ -341,7 +399,7 @@ if DEBUG:
 # SESSION CONFIGURATION
 # --------------------------------------------------
 
-SESSION_ENGINE = 'django.contrib.sessions.backends.db'
+SESSION_ENGINE = "django.contrib.sessions.backends.db"
 
 SESSION_COOKIE_AGE = 1209600
 
@@ -352,13 +410,11 @@ SESSION_SAVE_EVERY_REQUEST = False
 # DEFAULT PRIMARY KEY
 # --------------------------------------------------
 
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 
 # --------------------------------------------------
 # CSRF FAILURE DIAGNOSTICS
 # --------------------------------------------------
 
-CSRF_FAILURE_VIEW = 'core.views.csrf_failure'
-
-
+CSRF_FAILURE_VIEW = "core.views.csrf_failure"

@@ -1,10 +1,25 @@
+/* =====================================================
+   AUTOZ - VEHICLE DETAILS PAGE
+   Complete Responsive Styling
+===================================================== */
 
 .details-page {
   min-height: 100vh;
   background: #f4f5f7;
   color: #17191c;
   font-family: 'DM Sans', Arial, sans-serif;
+  box-sizing: border-box;
 }
+
+.details-page *,
+.details-page *::before,
+.details-page *::after {
+  box-sizing: border-box;
+}
+
+/* =====================================================
+   HEADER
+===================================================== */
 
 .details-header {
   min-height: 76px;
@@ -50,6 +65,10 @@
   letter-spacing: 1.5px;
 }
 
+/* =====================================================
+   MAIN LAYOUT
+===================================================== */
+
 .details-container {
   max-width: 1250px;
   margin: 42px auto;
@@ -69,6 +88,10 @@
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.09);
 }
 
+/* =====================================================
+   MAIN VEHICLE IMAGE
+===================================================== */
+
 .details-main-image {
   width: 100%;
   height: 510px;
@@ -86,10 +109,156 @@
   letter-spacing: 5px;
 }
 
+/* =====================================================
+   IMAGE GALLERY
+===================================================== */
+
+.details-gallery-main {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background: #17191c;
+}
+
+.details-gallery-main .details-main-image {
+  width: 100%;
+  height: 510px;
+  object-fit: contain;
+  display: block;
+  background: #17191c;
+}
+
+/* Gallery arrows */
+
+.gallery-arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 5;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.72);
+  color: white;
+  font-size: 30px;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.gallery-arrow:hover {
+  background: #f47b20;
+  border-color: #f47b20;
+  color: white;
+}
+
+.gallery-arrow:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.gallery-prev {
+  left: 15px;
+}
+
+.gallery-next {
+  right: 15px;
+}
+
+/* Image counter */
+
+.gallery-counter {
+  position: absolute;
+  right: 15px;
+  bottom: 15px;
+  z-index: 5;
+  background: rgba(0, 0, 0, 0.75);
+  color: white;
+  padding: 8px 13px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+/* Gallery thumbnails */
+
+.details-gallery-thumbnails {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 14px;
+  background: #17191c;
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: #f47b20 #292b30;
+}
+
+.details-gallery-thumbnails::-webkit-scrollbar {
+  height: 6px;
+}
+
+.details-gallery-thumbnails::-webkit-scrollbar-track {
+  background: #292b30;
+  border-radius: 10px;
+}
+
+.details-gallery-thumbnails::-webkit-scrollbar-thumb {
+  background: #f47b20;
+  border-radius: 10px;
+}
+
+.gallery-thumbnail {
+  position: relative;
+  flex: 0 0 95px;
+  height: 75px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  background: #111;
+  cursor: pointer;
+  padding: 0;
+  transition: 0.2s;
+}
+
+.gallery-thumbnail img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.gallery-thumbnail.active {
+  border-color: #f47b20;
+  box-shadow: 0 0 0 2px rgba(244, 123, 32, 0.2);
+}
+
+.gallery-thumbnail:hover {
+  border-color: #f47b20;
+}
+
+.thumbnail-number {
+  position: absolute;
+  left: 5px;
+  bottom: 5px;
+  padding: 3px 7px;
+  border-radius: 5px;
+  color: white;
+  background: rgba(0, 0, 0, 0.75);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+/* Verified badge */
+
 .details-verified {
   position: absolute;
   top: 18px;
   left: 18px;
+  z-index: 6;
   background: #15803d;
   color: white;
   padding: 10px 14px;
@@ -99,17 +268,28 @@
   letter-spacing: 1px;
 }
 
+/* Image caption */
+
 .image-caption {
   position: absolute;
   bottom: 0;
   left: 0;
   right: 0;
+  z-index: 4;
   padding: 30px 20px 18px;
   color: white;
   font-size: 13px;
   font-weight: 700;
-  background: linear-gradient(transparent, rgba(0, 0, 0, 0.7));
+  background: linear-gradient(
+    transparent,
+    rgba(0, 0, 0, 0.7)
+  );
+  pointer-events: none;
 }
+
+/* =====================================================
+   VEHICLE INFORMATION
+===================================================== */
 
 .details-information {
   background: white;
@@ -165,6 +345,10 @@
   margin: 22px 0 16px;
 }
 
+/* =====================================================
+   SPECIFICATIONS
+===================================================== */
+
 .specifications-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -192,6 +376,10 @@
   overflow-wrap: anywhere;
 }
 
+/* =====================================================
+   DESCRIPTION
+===================================================== */
+
 .details-description {
   margin-top: 26px;
   border-top: 1px solid #eeeeee;
@@ -205,12 +393,133 @@
   white-space: pre-line;
 }
 
-/* AUCTION */
+/* =====================================================
+   VEHICLE LOCATION
+===================================================== */
+
+.vehicle-location-section {
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid #eeeeee;
+}
+
+.vehicle-location-heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 17px;
+}
+
+.location-icon {
+  width: 45px;
+  height: 45px;
+  border-radius: 10px;
+  background: #fff1e7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 23px;
+  flex-shrink: 0;
+}
+
+.vehicle-location-heading h2 {
+  margin: 5px 0 0 !important;
+  font-size: 19px;
+}
+
+.vehicle-location-card {
+  padding: 20px;
+  background: #f5f6f8;
+  border: 1px solid #e8e9ed;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.vehicle-location-address {
+  padding-bottom: 14px;
+  border-bottom: 1px solid #e1e3e7;
+}
+
+.vehicle-location-address strong {
+  display: block;
+  color: #777b84;
+  font-size: 12px;
+  margin-bottom: 7px;
+}
+
+.vehicle-location-address p {
+  margin: 0;
+  color: #17191c;
+  font-size: 14px;
+  line-height: 1.7;
+  overflow-wrap: anywhere;
+}
+
+.vehicle-location-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.vehicle-location-item {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vehicle-location-item span {
+  color: #777b84;
+  font-size: 12px;
+}
+
+.vehicle-location-item strong {
+  color: #17191c;
+  font-size: 14px;
+  overflow-wrap: anywhere;
+}
+
+.vehicle-location-unavailable {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #f5f6f8;
+  border: 1px solid #e8e9ed;
+  border-radius: 10px;
+}
+
+.vehicle-location-unavailable > span {
+  font-size: 22px;
+}
+
+.vehicle-location-unavailable p {
+  margin: 0;
+  color: #777b84;
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+/* =====================================================
+   AUCTION SECTION - DARK THEME
+===================================================== */
 
 .auction-section {
   margin-top: 32px;
-  padding-top: 22px;
-  border-top: 1px solid #e9eaed;
+  padding: 24px;
+  background: #17191c !important;
+  color: #ffffff !important;
+  border: none !important;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+/* Force auction headings to remain white */
+
+.auction-section h2,
+.auction-section h3 {
+  color: #ffffff !important;
 }
 
 .auction-heading {
@@ -218,18 +527,22 @@
   justify-content: space-between;
   align-items: center;
   gap: 12px;
+  margin-bottom: 18px;
 }
 
 .auction-heading h2 {
-  margin: 5px 0 15px;
+  margin: 5px 0 0;
+  color: #ffffff !important;
 }
 
 .section-eyebrow {
-  color: #f47b20;
+  color: #f47b20 !important;
   font-size: 10px;
   font-weight: 900;
   letter-spacing: 1.6px;
 }
+
+/* Auction status badge */
 
 .auction-status {
   padding: 8px 12px;
@@ -241,25 +554,30 @@
 }
 
 .auction-status.live {
-  color: #15803d;
-  background: #e9f7ee;
+  color: #15803d !important;
+  background: #e9f7ee !important;
 }
 
 .auction-status.closed {
-  color: #c62828;
-  background: #feecec;
+  color: #c62828 !important;
+  background: #feecec !important;
 }
+
+/* =====================================================
+   AUCTION PRICE CARDS
+===================================================== */
 
 .auction-price-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 11px;
+  gap: 12px;
 }
 
 .auction-price-card {
-  padding: 16px;
-  background: #f5f6f8;
-  border: 1px solid #eceef1;
+  padding: 17px;
+  background: #f4f5f7 !important;
+  color: #17191c !important;
+  border: 1px solid #e1e3e7 !important;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
@@ -268,45 +586,61 @@
 }
 
 .auction-price-card span {
-  color: #777b84;
-  font-size: 11px;
+  color: #747985 !important;
+  font-size: 12px;
 }
 
 .auction-price-card strong {
-  font-size: 17px;
+  color: #17191c !important;
+  font-size: 19px;
+  font-weight: 800;
   overflow-wrap: anywhere;
 }
 
+/* Highlight current highest bid */
+
 .auction-price-card.highlight {
-  background: #fff5ed;
-  border-color: #ffdfc8;
+  background: #fff4e9 !important;
+  border: 1px solid #ffdbbd !important;
+}
+
+.auction-price-card.highlight span {
+  color: #916b4f !important;
 }
 
 .auction-price-card.highlight strong {
-  color: #e66d18;
+  color: #e66d18 !important;
 }
+
+/* =====================================================
+   AUCTION ENDING
+===================================================== */
 
 .auction-ending {
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 12px;
-  margin-top: 13px;
-  padding: 15px;
-  background: #17191c;
-  color: white;
+  margin-top: 14px;
+  padding: 16px;
+  background: #24262b !important;
+  color: #e5e7eb !important;
+  border: 1px solid #35373d;
   border-radius: 9px;
   font-size: 12px;
 }
 
 .auction-ending strong {
+  color: #ffffff !important;
   text-align: right;
 }
 
-/* BID HISTORY */
+/* =====================================================
+   BID HISTORY
+===================================================== */
 
 .bid-history-section {
-  margin-top: 25px;
+  margin-top: 28px;
 }
 
 .section-title-row {
@@ -318,15 +652,18 @@
 
 .section-title-row h2 {
   margin: 0 0 14px;
+  color: #ffffff !important;
 }
 
 .section-title-row span {
-  color: #777b84;
+  color: #9ca3af !important;
   font-size: 11px;
 }
 
 .bid-history-list {
-  border: 1px solid #eceef1;
+  background: #222429 !important;
+  color: #ffffff !important;
+  border: 1px solid #36383e !important;
   border-radius: 10px;
   overflow: hidden;
 }
@@ -337,11 +674,11 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  border-bottom: 1px solid #eceef1;
+  border-bottom: 1px solid #36383e !important;
 }
 
 .bid-history-item:last-child {
-  border-bottom: none;
+  border-bottom: none !important;
 }
 
 .bid-history-item > div {
@@ -351,67 +688,81 @@
 }
 
 .bid-history-item > div strong {
+  color: #ffffff !important;
   font-size: 13px;
 }
 
 .bid-history-item span {
-  color: #858891;
+  color: #a1a1aa !important;
   font-size: 11px;
 }
 
 .bid-history-amount {
-  color: #15803d;
+  color: #4ade80 !important;
   font-size: 14px;
   white-space: nowrap;
 }
 
+/* No bid history */
+
 .no-bids {
   padding: 18px;
-  background: #f5f6f8;
+  background: #24262b !important;
+  color: #aeb4bf !important;
+  border: 1px solid #36383e;
   border-radius: 9px;
-  color: #777b84;
   font-size: 13px;
   text-align: center;
 }
 
-/* PLACE BID */
+/* =====================================================
+   PLACE YOUR BID
+===================================================== */
 
 .place-bid-section {
   margin-top: 25px;
   padding: 22px;
-  background: #17191c;
-  color: white;
+  background: #222429 !important;
+  color: #ffffff !important;
+  border: 1px solid #36383e;
   border-radius: 12px;
 }
 
 .place-bid-section h2 {
   margin-top: 0;
-  color: white;
+  color: #ffffff !important;
 }
 
 .minimum-bid-info {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   gap: 12px;
   padding: 14px;
   margin-bottom: 18px;
   border-radius: 8px;
-  background: #292b30;
+  background: #303239 !important;
+  color: #d1d5db !important;
   font-size: 12px;
 }
 
 .minimum-bid-info strong {
-  color: #ff9a50;
+  color: #ff9a50 !important;
   font-size: 15px;
 }
+
+/* Bid labels */
 
 .place-bid-section label,
 .report-section label {
   display: block;
   margin: 14px 0 7px;
+  color: inherit;
   font-size: 12px;
   font-weight: 700;
 }
+
+/* Form inputs */
 
 .place-bid-section input,
 .report-section input,
@@ -421,8 +772,8 @@
   padding: 13px;
   border: 1px solid #dedfe3;
   border-radius: 7px;
-  background: white;
-  color: #17191c;
+  background: white !important;
+  color: #17191c !important;
   font: inherit;
   font-size: 13px;
   outline: none;
@@ -437,6 +788,8 @@
   box-shadow: 0 0 0 3px rgba(244, 123, 32, 0.12);
 }
 
+/* Quick bid buttons */
+
 .quick-bid-buttons {
   display: flex;
   gap: 9px;
@@ -448,8 +801,8 @@
   padding: 10px 5px;
   border: 1px solid #55575d;
   border-radius: 6px;
-  background: transparent;
-  color: white;
+  background: transparent !important;
+  color: white !important;
   font-size: 12px;
   font-weight: 800;
   cursor: pointer;
@@ -457,9 +810,11 @@
 }
 
 .quick-bid-buttons button:hover {
-  background: #f47b20;
-  border-color: #f47b20;
+  background: #f47b20 !important;
+  border-color: #f47b20 !important;
 }
+
+/* Place bid button */
 
 .place-bid-button {
   width: 100%;
@@ -467,8 +822,8 @@
   padding: 15px;
   border: none;
   border-radius: 7px;
-  background: #f47b20;
-  color: white;
+  background: #f47b20 !important;
+  color: white !important;
   font-weight: 900;
   cursor: pointer;
   transition: 0.2s;
@@ -476,7 +831,7 @@
 
 .place-bid-button:hover,
 .report-submit-button:hover {
-  background: #d96512;
+  background: #d96512 !important;
 }
 
 .place-bid-button:disabled,
@@ -485,17 +840,22 @@
   cursor: not-allowed;
 }
 
+/* Auction messages */
+
 .auction-closed-message,
 .no-auction-message {
   padding: 17px;
   border-radius: 8px;
-  background: #fff0f0;
-  color: #bd2929;
+  background: #3a2222 !important;
+  color: #ffb4b4 !important;
+  border: 1px solid #613333;
   font-size: 13px;
   line-height: 1.6;
 }
 
-/* REPORT */
+/* =====================================================
+   REPORT VEHICLE
+===================================================== */
 
 .report-section {
   margin-top: 30px;
@@ -518,6 +878,8 @@
   min-height: 100px;
 }
 
+/* Report button */
+
 .report-submit-button {
   width: 100%;
   margin-top: 14px;
@@ -530,6 +892,10 @@
   cursor: pointer;
   transition: 0.2s;
 }
+
+/* =====================================================
+   FORM MESSAGES
+===================================================== */
 
 .form-error,
 .form-success {
@@ -550,6 +916,10 @@
   background: #e9f7ee;
 }
 
+/* =====================================================
+   BACK TO LIST BUTTON
+===================================================== */
+
 .details-back-button {
   width: 100%;
   margin-top: 25px;
@@ -567,7 +937,9 @@
   background: #d96512;
 }
 
-/* LOADING / ERROR */
+/* =====================================================
+   LOADING / ERROR
+===================================================== */
 
 .details-state {
   min-height: 100vh;
@@ -610,6 +982,10 @@
   }
 }
 
+/* =====================================================
+   FOOTER
+===================================================== */
+
 .details-footer {
   min-height: 100px;
   padding: 20px;
@@ -627,7 +1003,9 @@
   font-size: 11px;
 }
 
-/* TABLET */
+/* =====================================================
+   TABLET
+===================================================== */
 
 @media (max-width: 900px) {
   .details-container {
@@ -645,9 +1023,15 @@
   .details-no-image {
     height: 400px;
   }
+
+  .details-gallery-main .details-main-image {
+    height: 400px;
+  }
 }
 
-/* MOBILE */
+/* =====================================================
+   MOBILE
+===================================================== */
 
 @media (max-width: 600px) {
   .details-header {
@@ -679,6 +1063,45 @@
     height: 270px;
   }
 
+  .details-gallery-main .details-main-image {
+    height: 270px;
+  }
+
+  /* Gallery */
+
+  .gallery-arrow {
+    width: 38px;
+    height: 38px;
+    font-size: 25px;
+  }
+
+  .gallery-prev {
+    left: 8px;
+  }
+
+  .gallery-next {
+    right: 8px;
+  }
+
+  .gallery-counter {
+    right: 8px;
+    bottom: 8px;
+    font-size: 12px;
+    padding: 6px 10px;
+  }
+
+  .gallery-thumbnail {
+    flex-basis: 78px;
+    height: 62px;
+  }
+
+  .details-gallery-thumbnails {
+    gap: 8px;
+    padding: 10px;
+  }
+
+  /* Vehicle information */
+
   .details-information {
     padding: 19px;
   }
@@ -704,8 +1127,38 @@
     font-size: 12px;
   }
 
+  /* Location */
+
+  .vehicle-location-card {
+    padding: 15px;
+    gap: 13px;
+  }
+
+  .vehicle-location-row {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .vehicle-location-item strong {
+    font-size: 12px;
+  }
+
+  .vehicle-location-address p {
+    font-size: 13px;
+  }
+
+  /* Auction */
+
+  .auction-section {
+    padding: 16px;
+  }
+
   .auction-price-grid {
     grid-template-columns: 1fr;
+  }
+
+  .auction-price-card strong {
+    font-size: 17px;
   }
 
   .auction-ending {
@@ -743,6 +1196,10 @@
   }
 }
 
+/* =====================================================
+   SMALL MOBILE
+===================================================== */
+
 @media (max-width: 360px) {
   .specifications-grid {
     grid-template-columns: 1fr;
@@ -750,5 +1207,18 @@
 
   .details-information {
     padding: 15px;
+  }
+
+  .gallery-thumbnail {
+    flex-basis: 68px;
+    height: 55px;
+  }
+
+  .auction-section {
+    padding: 13px;
+  }
+
+  .place-bid-section {
+    padding: 14px;
   }
 }
