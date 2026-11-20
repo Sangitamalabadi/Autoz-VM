@@ -1,5 +1,5 @@
-
 import json
+import logging
 from decimal import Decimal
 
 from django.contrib.auth import (
@@ -60,6 +60,7 @@ from .serializers import (
 
 User = get_user_model()
 
+logger = logging.getLogger(__name__)
 
 
 # =====================================
@@ -358,6 +359,7 @@ def buyer_register_api(request):
             'message': 'Unable to create Buyer account. Please try again.',
         }, status=500)
 
+
 # =====================================
 # SELLER REGISTRATION API
 # =====================================
@@ -471,6 +473,7 @@ def seller_register_api(request):
             'success': False,
             'message': 'Unable to create Seller account. Please try again.',
         }, status=500)
+
 
 # =====================================
 # BUYER LOGIN API
@@ -938,6 +941,10 @@ class SellerVehicleImageUploadAPI(generics.GenericAPIView):
 
         vehicle = self.get_vehicle()
 
+        # =====================================
+        # BID HISTORY PROTECTION
+        # =====================================
+
         if Bid.objects.filter(
             auction__vehicle=vehicle
         ).exists():
@@ -949,18 +956,28 @@ class SellerVehicleImageUploadAPI(generics.GenericAPIView):
                 )
             })
 
+        # =====================================
+        # GET UPLOADED IMAGES
+        # =====================================
+
         images = request.FILES.getlist('images')
 
         if not images:
+
             single_image = request.FILES.get('image')
 
             if single_image:
                 images = [single_image]
 
         if not images:
+
             raise ValidationError({
                 'images': 'Please select at least one image.'
             })
+
+        # =====================================
+        # IMAGE COUNT VALIDATION
+        # =====================================
 
         current_count = (
             (1 if vehicle.image else 0)
@@ -968,6 +985,7 @@ class SellerVehicleImageUploadAPI(generics.GenericAPIView):
         )
 
         if current_count + len(images) > 15:
+
             raise ValidationError({
                 'images': (
                     f'You can upload only '
@@ -975,6 +993,10 @@ class SellerVehicleImageUploadAPI(generics.GenericAPIView):
                     'The maximum is 15 including the main image.'
                 )
             })
+
+        # =====================================
+        # PREPARE IMAGE OBJECTS
+        # =====================================
 
         image_objects = [
             VehicleImage(
@@ -984,42 +1006,88 @@ class SellerVehicleImageUploadAPI(generics.GenericAPIView):
             for image in images
         ]
 
-        with transaction.atomic():
+        # =====================================
+        # SAVE IMAGES + DIAGNOSTIC LOGGING
+        # =====================================
 
-            VehicleImage.objects.bulk_create(
-                image_objects
-            )
+        try:
 
-            if vehicle.listing_status == 'APPROVED':
-                vehicle.listing_status = 'PENDING'
-                vehicle.rejection_reason = ''
-                vehicle.save(
-                    update_fields=[
-                        'listing_status',
-                        'rejection_reason',
-                        'updated_at',
-                    ]
+            with transaction.atomic():
+
+                # Save gallery images
+                VehicleImage.objects.bulk_create(
+                    image_objects
                 )
 
-        saved_images = VehicleImage.objects.filter(
-            vehicle=vehicle
-        ).order_by('-id')[:len(images)]
+                # Require admin reapproval if approved
+                if vehicle.listing_status == 'APPROVED':
 
-        serializer = self.get_serializer(
-            saved_images,
-            many=True,
-        )
+                    vehicle.listing_status = 'PENDING'
+                    vehicle.rejection_reason = ''
 
-        return Response(
-            {
+                    vehicle.save(
+                        update_fields=[
+                            'listing_status',
+                            'rejection_reason',
+                            'updated_at',
+                        ]
+                    )
+
+            # =====================================
+            # FETCH SAVED IMAGES
+            # =====================================
+
+            saved_images = VehicleImage.objects.filter(
+                vehicle=vehicle
+            ).order_by('-id')[:len(images)]
+
+            # =====================================
+            # SERIALIZE RESPONSE
+            # =====================================
+
+            serializer = self.get_serializer(
+                saved_images,
+                many=True,
+            )
+
+            response_data = {
                 'success': True,
                 'message': 'Vehicle images uploaded successfully.',
                 'count': len(images),
                 'images': serializer.data,
                 'listing_status': vehicle.listing_status,
-            },
-            status=status.HTTP_201_CREATED,
-        )
+            }
+
+            # =====================================
+            # SUCCESS LOG
+            # =====================================
+
+            logger.info(
+                'Vehicle gallery upload successful. '
+                'Vehicle ID: %s, Images uploaded: %s',
+                vehicle.pk,
+                len(images),
+            )
+
+            return Response(
+                response_data,
+                status=status.HTTP_201_CREATED,
+            )
+
+        # =====================================
+        # ERROR LOG - FULL TRACEBACK
+        # =====================================
+
+        except Exception:
+
+            logger.exception(
+                'Vehicle gallery image upload failed. '
+                'Vehicle ID: %s, Number of images: %s',
+                vehicle.pk,
+                len(images),
+            )
+
+            raise
 
 
 # =====================================
@@ -1196,6 +1264,7 @@ class BuyerMyBidsAPI(generics.ListAPIView):
             '-bid_time',
             '-id',
         )
+
 
 # =====================================
 # ADMIN LOGIN API
